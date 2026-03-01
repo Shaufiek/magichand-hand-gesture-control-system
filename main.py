@@ -3,516 +3,390 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
-import time
-import sys
-import os
 import math
+import time
+import os
 
-class HandLandmarkDetector:
-    """
-    A class for hand landmark detection with coordinate extraction and normalization
-    """
+class HandDetector:
+    """Hand detection with gesture recognition"""
     
-    def __init__(self, max_hands=2, detection_confidence=0.5):
-        """
-        Initialize the hand detector using MediaPipe Tasks API.
-        """
+    def __init__(self, max_hands=2):
         self.max_hands = max_hands
-        self.detection_confidence = detection_confidence
         self.frame_height = 0
         self.frame_width = 0
         
-        # Download model if needed
-        model_path = self._get_model_path()
+        # Volume control
+        self.current_volume = 50
+        self.pinch_active = False
         
-        # Initialize the landmarker
+        # Pinch calibration
+        self.min_pinch = 1.0
+        self.max_pinch = 0.0
+        self.calibration_frames = 0
+        self.calibrated = False
+        
+        # Gesture state tracking
+        self.last_gesture = {}
+        self.last_trigger_time = {}
+        self.cooldown = 0.5
+        self.triggered = {'OPEN_PALM': False, 'FIST': False, 
+                         'THUMBS_UP': False, 'THUMBS_DOWN': False}
+        
+        # Load model
+        model_path = self._get_model()
         options = vision.HandLandmarkerOptions(
             base_options=python.BaseOptions(model_asset_path=model_path),
             running_mode=vision.RunningMode.VIDEO,
-            num_hands=max_hands,
-            min_hand_detection_confidence=detection_confidence,
-            min_hand_presence_confidence=detection_confidence,
-            min_tracking_confidence=detection_confidence
+            num_hands=max_hands
         )
-        
-        self.landmarker = vision.HandLandmarker.create_from_options(options)
-        print(f"Hand detector initialized successfully!")
-        print(f"  - Max hands: {max_hands}")
-        print(f"  - Detection confidence: {detection_confidence}")
-    
-    def _get_model_path(self):
-        """Get or download the hand landmark model."""
-        model_path = os.path.join(os.path.dirname(__file__), "hand_landmarker.task")
-        
-        if not os.path.exists(model_path):
-            print("Downloading hand landmark model...")
+        self.detector = vision.HandLandmarker.create_from_options(options)
+        print("✓ Hand detector ready")
+
+    def _get_model(self):
+        path = os.path.join(os.path.dirname(__file__), "hand_landmarker.task")
+        if not os.path.exists(path):
+            print("Downloading hand model...")
             import urllib.request
             url = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
-            urllib.request.urlretrieve(url, model_path)
+            urllib.request.urlretrieve(url, path)
+        return path
+
+    def process_frame(self, frame, mirror=True):
+        """Main function - detect hands and gestures"""
+        h, w = frame.shape[:2]
+        self.frame_height, self.frame_width = h, w
         
-        return model_path
-    
-    def find_hands(self, frame, draw=True, flip_type=True):
-        """
-        Detect hands in the frame and extract landmarks with normalized coordinates.
-        """
-        # Store frame dimensions
-        self.frame_height, self.frame_width = frame.shape[:2]
-        
-        # Flip for mirror effect
-        if flip_type:
-            working_frame = cv2.flip(frame, 1)
-        else:
-            working_frame = frame
-        
-        # Convert BGR to RGB and create MediaPipe Image
-        rgb_frame = cv2.cvtColor(working_frame, cv2.COLOR_BGR2RGB)
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+        if mirror:
+            frame = cv2.flip(frame, 1)
         
         # Detect hands
-        timestamp = int(time.time() * 1000)
-        detection_result = self.landmarker.detect_for_video(mp_image, timestamp)
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        results = self.detector.detect_for_video(mp_image, int(time.time() * 1000))
         
-        # Process results
-        hands_data = []
+        # Reset triggers
+        for g in self.triggered:
+            self.triggered[g] = False
         
-        if detection_result and detection_result.hand_landmarks:
-            for idx, hand_landmarks in enumerate(detection_result.hand_landmarks):
-                # Extract both raw and normalized landmarks
-                landmarks_raw = self._extract_raw_landmarks(hand_landmarks)
-                landmarks_norm = self._extract_normalized_landmarks(hand_landmarks)
+        hands = []
+        if results and results.hand_landmarks:
+            for idx, landmarks in enumerate(results.hand_landmarks):
+                # Get hand side
+                side = "Unknown"
+                if results.handedness and idx < len(results.handedness):
+                    side = results.handedness[idx][0].category_name
                 
-                # Get handedness
-                hand_label = "Unknown"
-                hand_score = 1.0
-                if detection_result.handedness and idx < len(detection_result.handedness):
-                    hand_label = detection_result.handedness[idx][0].category_name
-                    hand_score = detection_result.handedness[idx][0].score
+                # Convert to pixel coordinates
+                points = [(int(lm.x * w), int(lm.y * h)) for lm in landmarks]
                 
-                # Calculate hand bounding box and center
-                bbox = self._calculate_bounding_box(landmarks_raw)
-                hand_center = self._calculate_hand_center(landmarks_raw)
+                # Recognize gestures
+                gesture = self._get_gesture(points)
+                hand_id = f"{side}_{idx}"
                 
-                # Calculate relative positions (normalized relative to wrist)
-                relative_landmarks = self._calculate_relative_positions(landmarks_raw)
+                # Check if gesture triggered
+                if gesture != "UNKNOWN":
+                    self._check_trigger(hand_id, gesture)
                 
-                # Calculate scale-invariant features (distances between key points)
-                scale_invariant_features = self._calculate_scale_invariant_features(landmarks_raw)
+                # Get pinch data
+                pinch = self._get_pinch(points)
                 
-                hand_data = {
-                    'hand_id': idx,
-                    'hand_label': hand_label,
-                    'confidence': hand_score,
-                    'landmarks_raw': landmarks_raw,        # Pixel coordinates
-                    'landmarks_norm': landmarks_norm,      # Normalized coordinates (0-1)
-                    'relative_landmarks': relative_landmarks,  # Relative to wrist
-                    'scale_invariant_features': scale_invariant_features,  # Distance ratios
-                    'bounding_box': bbox,                  # Hand bounding box
-                    'hand_center': hand_center,            # Center of hand
-                    'wrist_position': landmarks_raw[0] if landmarks_raw else None  # Wrist position
-                }
-                hands_data.append(hand_data)
+                hands.append({
+                    'id': hand_id,
+                    'side': side,
+                    'gesture': gesture,
+                    'pinch': pinch
+                })
                 
-                # Draw on frame if requested
-                if draw:
-                    self._draw_landmarks(working_frame, hand_landmarks, hand_label, bbox, hand_center)
+                # Draw on frame
+                self._draw_hand(frame, landmarks, gesture, pinch)
         
-        # Copy the annotated working frame back to the original frame
-        frame[:] = working_frame
+        return frame, hands
+
+    def _get_gesture(self, pts):
+        """Recognize open palm, fist, thumbs up/down"""
+        if len(pts) < 21:
+            return "UNKNOWN"
         
-        return frame, hands_data
-    
-    def _extract_raw_landmarks(self, hand_landmarks):
-        """
-        Extract raw pixel coordinates for all 21 landmarks.
+        def angle_between(p1, p2, p3):
+            """Calculate angle at p2 between p1-p2-p3"""
+            v1 = (p1[0] - p2[0], p1[1] - p2[1])
+            v2 = (p3[0] - p2[0], p3[1] - p2[1])
+            
+            dot = v1[0]*v2[0] + v1[1]*v2[1]
+            mag1 = math.sqrt(v1[0]**2 + v1[1]**2)
+            mag2 = math.sqrt(v2[0]**2 + v2[1]**2)
+            
+            if mag1 * mag2 == 0:
+                return 180
+            
+            # Clamp to avoid math domain error
+            cos = dot / (mag1 * mag2)
+            cos = max(-1, min(1, cos))
+            return math.degrees(math.acos(cos))
         
-        Returns:
-            list: List of (x, y) tuples in pixel coordinates
-        """
-        landmarks = []
-        for lm in hand_landmarks:
-            cx = int(lm.x * self.frame_width)
-            cy = int(lm.y * self.frame_height)
-            landmarks.append((cx, cy))
-        return landmarks
-    
-    def _extract_normalized_landmarks(self, hand_landmarks):
-        """
-        Extract normalized coordinates (0-1 range) for all 21 landmarks.
-        These are scale-invariant and work regardless of image size.
+        def is_curled(tip, pip, mcp):
+            """Check if finger is curled using angle at PIP"""
+            angle = angle_between(pts[mcp], pts[pip], pts[tip])
+            return angle < 140
         
-        Returns:
-            list: List of (x_norm, y_norm) tuples in range [0, 1]
-        """
-        landmarks = []
-        for lm in hand_landmarks:
-            landmarks.append((lm.x, lm.y))
-        return landmarks
-    
-    def _calculate_bounding_box(self, landmarks_raw):
-        """
-        Calculate the bounding box around the hand.
+        # Check fingers
+        curled = [
+            is_curled(8, 6, 5),    # Index
+            is_curled(12, 10, 9),  # Middle
+            is_curled(16, 14, 13), # Ring
+            is_curled(20, 18, 17)  # Pinky
+        ]
+        curled_count = sum(curled)
         
-        Returns:
-            dict: Bounding box with x_min, y_min, width, height
-        """
-        if not landmarks_raw:
-            return None
+        # Check thumb
+        hand_size = math.dist(pts[0], pts[9])
+        thumb_out = math.dist(pts[4], pts[5]) / hand_size > 0.7 if hand_size > 0 else False
+        thumb_up = pts[4][1] < pts[0][1] - 30
+        thumb_down = pts[4][1] > pts[0][1] + 30
         
-        x_coords = [point[0] for point in landmarks_raw]
-        y_coords = [point[1] for point in landmarks_raw]
+        # Classify
+        if curled_count <= 1 and thumb_out:
+            return "OPEN_PALM"
+        elif curled_count >= 3 and not thumb_out:
+            return "FIST"
+        elif curled_count >= 3 and thumb_out and thumb_up:
+            return "THUMBS_UP"
+        elif curled_count >= 3 and thumb_out and thumb_down:
+            return "THUMBS_DOWN"
         
-        x_min, x_max = min(x_coords), max(x_coords)
-        y_min, y_max = min(y_coords), max(y_coords)
+        return "UNKNOWN"
+
+    def _check_trigger(self, hand_id, gesture):
+        """Trigger only on gesture change"""
+        last = self.last_gesture.get(hand_id, "UNKNOWN")
+        now = time.time()
+        
+        if gesture != last and gesture in self.triggered:
+            last_time = self.last_trigger_time.get(gesture, 0)
+            if now - last_time > self.cooldown:
+                self.triggered[gesture] = True
+                self.last_trigger_time[gesture] = now
+                print(f"👉 {gesture}")
+        
+        self.last_gesture[hand_id] = gesture
+
+    def _get_pinch(self, pts):
+        """Measure pinch for volume"""
+        if len(pts) < 21:
+            return {'active': False, 'volume': self.current_volume}
+        
+        # Distance between thumb tip (4) and index tip (8)
+        dist = math.dist(pts[4], pts[8])
+        hand_size = math.dist(pts[0], pts[9])
+        norm_dist = dist / hand_size if hand_size > 0 else 0
+        
+        # Is pinching?
+        pinching = norm_dist < 0.5 or dist < 70
+        
+        # Calibration
+        if pinching and not self.calibrated:
+            self.calibration_frames += 1
+            self.min_pinch = min(self.min_pinch, norm_dist)
+            self.max_pinch = max(self.max_pinch, norm_dist)
+            if self.calibration_frames >= 100:
+                self.calibrated = True
+                print(f"✓ Calibrated: {self.min_pinch:.2f}-{self.max_pinch:.2f}")
+        
+        # Map to volume
+        if self.calibrated:
+            low = max(0.05, self.min_pinch - 0.03)
+            high = min(1.5, self.max_pinch + 0.1)
+        else:
+            low, high = 0.12, 0.9
+        
+        if high <= low:
+            high = low + 0.3
+        
+        clamped = max(low, min(high, norm_dist))
+        percent = ((clamped - low) / (high - low)) * 100
+        percent = max(0, min(100, percent))
+        
+        if pinching:
+            self.current_volume = int(percent * 0.6 + self.current_volume * 0.4)
         
         return {
-            'x_min': x_min,
-            'y_min': y_min,
-            'width': x_max - x_min,
-            'height': y_max - y_min,
-            'center_x': (x_min + x_max) // 2,
-            'center_y': (y_min + y_max) // 2
+            'active': pinching,
+            'percent': percent,
+            'volume': self.current_volume,
+            'calibrated': self.calibrated,
+            'progress': min(100, int(self.calibration_frames/100 * 100))
         }
-    
-    def _calculate_hand_center(self, landmarks_raw):
-        """
-        Calculate the center of the hand (average of all landmarks).
-        
-        Returns:
-            tuple: (center_x, center_y)
-        """
-        if not landmarks_raw:
-            return None
-        
-        avg_x = sum(point[0] for point in landmarks_raw) // len(landmarks_raw)
-        avg_y = sum(point[1] for point in landmarks_raw) // len(landmarks_raw)
-        
-        return (avg_x, avg_y)
-    
-    def _calculate_relative_positions(self, landmarks_raw):
-        """
-        Calculate positions relative to the wrist (landmark 0).
-        This makes gestures invariant to hand position on screen.
-        
-        Returns:
-            list: List of (dx, dy) relative to wrist
-        """
-        if not landmarks_raw or len(landmarks_raw) < 1:
-            return []
-        
-        wrist_x, wrist_y = landmarks_raw[0]
-        relative_positions = []
-        
-        for i, (x, y) in enumerate(landmarks_raw):
-            dx = x - wrist_x
-            dy = y - wrist_y
-            relative_positions.append((dx, dy))
-        
-        return relative_positions
-    
-    def _calculate_scale_invariant_features(self, landmarks_raw):
-        """
-        Calculate scale-invariant features like distances between key points.
-        These features work regardless of hand distance from camera.
-        
-        Returns:
-            dict: Dictionary of scale-invariant features
-        """
-        if not landmarks_raw or len(landmarks_raw) < 21:
-            return {}
-        
-        features = {}
-        
-        # Helper function to calculate distance between two landmarks
-        def distance(idx1, idx2):
-            x1, y1 = landmarks_raw[idx1]
-            x2, y2 = landmarks_raw[idx2]
-            return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        
-        # Get palm size (distance from wrist to middle finger MCP) as reference
-        palm_size = distance(0, 9)  # Wrist to middle finger base
-        
-        if palm_size > 0:  # Avoid division by zero
-            # Normalized finger lengths (divided by palm size)
-            features['thumb_length'] = distance(0, 4) / palm_size      # Wrist to thumb tip
-            features['index_length'] = distance(0, 8) / palm_size      # Wrist to index tip
-            features['middle_length'] = distance(0, 12) / palm_size    # Wrist to middle tip
-            features['ring_length'] = distance(0, 16) / palm_size      # Wrist to ring tip
-            features['pinky_length'] = distance(0, 20) / palm_size     # Wrist to pinky tip
-            
-            # Normalized finger tip distances from each other
-            features['thumb_index_distance'] = distance(4, 8) / palm_size   # Thumb to index
-            features['index_middle_distance'] = distance(8, 12) / palm_size # Index to middle
-            features['middle_ring_distance'] = distance(12, 16) / palm_size # Middle to ring
-            features['ring_pinky_distance'] = distance(16, 20) / palm_size  # Ring to pinky
-            
-            # Hand openness (average distance of fingertips from palm center)
-            palm_center = self._calculate_palm_center(landmarks_raw)
-            if palm_center:
-                px, py = palm_center
-                fingertip_indices = [4, 8, 12, 16, 20]
-                total_distance = 0
-                for idx in fingertip_indices:
-                    fx, fy = landmarks_raw[idx]
-                    dist = math.sqrt((fx - px)**2 + (fy - py)**2)
-                    total_distance += dist
-                features['hand_openness'] = (total_distance / 5) / palm_size
-        
-        return features
-    
-    def _calculate_palm_center(self, landmarks_raw):
-        """
-        Calculate the center of the palm using MCP joints.
-        
-        Returns:
-            tuple: (center_x, center_y) of palm
-        """
-        if len(landmarks_raw) < 13:  # Need at least up to middle MCP
-            return None
-        
-        # Use the MCP joints (base of fingers) to find palm center
-        mcp_indices = [1, 5, 9, 13, 17]  # Thumb MCP, Index MCP, Middle MCP, Ring MCP, Pinky MCP
-        
-        sum_x = 0
-        sum_y = 0
-        count = 0
-        
-        for idx in mcp_indices:
-            if idx < len(landmarks_raw):
-                x, y = landmarks_raw[idx]
-                sum_x += x
-                sum_y += y
-                count += 1
-        
-        if count > 0:
-            return (sum_x // count, sum_y // count)
-        return None
-    
-    def _draw_landmarks(self, frame, hand_landmarks, hand_label, bbox=None, hand_center=None):
-        """Draw landmarks, connections, and additional info on the frame."""
+
+    def _draw_hand(self, frame, landmarks, gesture, pinch):
+        """Draw hand landmarks and info"""
         h, w = frame.shape[:2]
         
-        # Define hand connections
-        connections = [
-            (0, 1), (1, 2), (2, 3), (3, 4),        # Thumb
-            (0, 5), (5, 6), (6, 7), (7, 8),        # Index
-            (0, 9), (9, 10), (10, 11), (11, 12),    # Middle
-            (0, 13), (13, 14), (14, 15), (15, 16),  # Ring
-            (0, 17), (17, 18), (18, 19), (19, 20),  # Pinky
-            (5, 9), (9, 13), (13, 17)               # Palm
-        ]
+        # Hand connections
+        connections = [(0,1),(1,2),(2,3),(3,4),(0,5),(5,6),(6,7),(7,8),
+                      (0,9),(9,10),(10,11),(11,12),(0,13),(13,14),(14,15),(15,16),
+                      (0,17),(17,18),(18,19),(19,20),(5,9),(9,13),(13,17)]
         
         # Draw connections
-        for connection in connections:
-            if connection[0] < len(hand_landmarks) and connection[1] < len(hand_landmarks):
-                pt1 = hand_landmarks[connection[0]]
-                pt2 = hand_landmarks[connection[1]]
-                x1, y1 = int(pt1.x * w), int(pt1.y * h)
-                x2, y2 = int(pt2.x * w), int(pt2.y * h)
-                cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
+        for a, b in connections:
+            if a < len(landmarks) and b < len(landmarks):
+                p1 = (int(landmarks[a].x * w), int(landmarks[a].y * h))
+                p2 = (int(landmarks[b].x * w), int(landmarks[b].y * h))
+                cv2.line(frame, p1, p2, (255,255,255), 2)
         
-        # Draw landmarks with different colors for fingertips
-        for i, lm in enumerate(hand_landmarks):
-            cx, cy = int(lm.x * w), int(lm.y * h)
-            # Fingertips (4,8,12,16,20) are yellow
-            if i in [4, 8, 12, 16, 20]:
-                cv2.circle(frame, (cx, cy), 8, (0, 255, 255), -1)  # Yellow
-                cv2.circle(frame, (cx, cy), 3, (255, 255, 255), -1)
-                # Add small label for fingertips in debug mode
-                # (You can enable this if needed)
+        # Draw landmarks
+        for i, lm in enumerate(landmarks):
+            x, y = int(lm.x * w), int(lm.y * h)
+            if i in [4, 8]:  # Thumb and index tips
+                color = (0,255,255) if pinch['active'] else (0,255,0)
+                cv2.circle(frame, (x,y), 8, color, -1)
             else:
-                cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)  # Green
-                cv2.circle(frame, (cx, cy), 2, (255, 255, 255), -1)
+                cv2.circle(frame, (x,y), 5, (0,255,0), -1)
+            cv2.circle(frame, (x,y), 2, (255,255,255), -1)
         
-        #Optionally draw bounding box (commented out by default)
-        # if bbox:
-        #     cv2.rectangle(frame, 
-        #                  (bbox['x_min'], bbox['y_min']), 
-        #                  (bbox['x_min'] + bbox['width'], bbox['y_min'] + bbox['height']), 
-        #                  (255, 0, 255), 2)
-    
-    def get_fingertip_positions(self, hand_data):
-        """Get fingertip positions as a dictionary."""
-        fingertips = {}
-        fingertip_ids = {'thumb': 4, 'index': 8, 'middle': 12, 'ring': 16, 'pinky': 20}
+        # Draw pinch line
+        if pinch['active']:
+            p1 = (int(landmarks[4].x * w), int(landmarks[4].y * h))
+            p2 = (int(landmarks[8].x * w), int(landmarks[8].y * h))
+            
+            if pinch['percent'] < 30:
+                color = (0,0,255)
+            elif pinch['percent'] < 70:
+                color = (0,255,255)
+            else:
+                color = (0,255,0)
+            
+            cv2.line(frame, p1, p2, color, 3)
+            mx, my = (p1[0]+p2[0])//2, (p1[1]+p2[1])//2
+            cv2.putText(frame, f"{int(pinch['percent'])}%", (mx-20, my-10),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
         
-        for name, tip_id in fingertip_ids.items():
-            if tip_id < len(hand_data['landmarks_raw']):
-                fingertips[name] = hand_data['landmarks_raw'][tip_id]
-        
-        return fingertips
-    
-    def get_normalized_fingertip_positions(self, hand_data):
-        """Get normalized fingertip positions (0-1 range)."""
-        fingertips = {}
-        fingertip_ids = {'thumb': 4, 'index': 8, 'middle': 12, 'ring': 16, 'pinky': 20}
-        
-        for name, tip_id in fingertip_ids.items():
-            if tip_id < len(hand_data['landmarks_norm']):
-                fingertips[name] = hand_data['landmarks_norm'][tip_id]
-        
-        return fingertips
-    
-    def get_relative_fingertip_positions(self, hand_data):
-        """Get fingertip positions relative to wrist."""
-        fingertips = {}
-        fingertip_ids = {'thumb': 4, 'index': 8, 'middle': 12, 'ring': 16, 'pinky': 20}
-        
-        for name, tip_id in fingertip_ids.items():
-            if tip_id < len(hand_data['relative_landmarks']):
-                fingertips[name] = hand_data['relative_landmarks'][tip_id]
-        
-        return fingertips
-    
-    def print_hand_data(self, hand_data):
-        """Print comprehensive hand data for debugging."""
-        if not hand_data:
-            print("No hand data")
-            return
-        
-        print(f"\n--- Hand {hand_data['hand_id'] + 1} ({hand_data['hand_label']}) ---")
-        print(f"Confidence: {hand_data['confidence']:.3f}")
-        
-        # Print raw fingertip positions
-        print("\nRaw Fingertip Positions (pixels):")
-        raw_tips = self.get_fingertip_positions(hand_data)
-        for finger, pos in raw_tips.items():
-            print(f"  {finger}: {pos}")
-        
-        # Print normalized fingertip positions
-        print("\nNormalized Fingertip Positions (0-1):")
-        norm_tips = self.get_normalized_fingertip_positions(hand_data)
-        for finger, pos in norm_tips.items():
-            print(f"  {finger}: ({pos[0]:.3f}, {pos[1]:.3f})")
-        
-        # Print scale-invariant features
-        print("\nScale-Invariant Features:")
-        for feature_name, value in hand_data['scale_invariant_features'].items():
-            print(f"  {feature_name}: {value:.3f}")
+        # Draw gesture name
+        if gesture != "UNKNOWN":
+            wrist = (int(landmarks[0].x * w), int(landmarks[0].y * h))
+            
+            if self.triggered.get(gesture, False):
+                cv2.rectangle(frame, (wrist[0]-70, wrist[1]-90), 
+                             (wrist[0]+120, wrist[1]-40), (0,255,255), -1)
+            else:
+                cv2.rectangle(frame, (wrist[0]-70, wrist[1]-90), 
+                             (wrist[0]+120, wrist[1]-40), (0,0,0), -1)
+            
+            icons = {"OPEN_PALM": "✋ OPEN", "FIST": "👊 FIST",
+                    "THUMBS_UP": "👍 UP", "THUMBS_DOWN": "👎 DOWN"}
+            colors = {"OPEN_PALM": (0,255,0), "FIST": (0,0,255),
+                     "THUMBS_UP": (255,255,0), "THUMBS_DOWN": (0,165,255)}
+            
+            cv2.putText(frame, icons.get(gesture, gesture), 
+                       (wrist[0]-65, wrist[1]-60),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, colors.get(gesture, (255,255,255)), 2)
 
-
-def flip_frame_horizontally(frame):
-    """Flip the frame horizontally to create a mirror-like experience."""
-    return cv2.flip(frame, 1)
-
+def draw_volume_bar(frame, volume, x, y, width=300, height=25):
+    """Draw volume bar"""
+    cv2.rectangle(frame, (x, y), (x+width, y+height), (50,50,50), -1)
+    
+    fill = int((volume / 100) * width)
+    if volume < 30:
+        color = (0,0,255)
+    elif volume < 70:
+        color = (0,255,255)
+    else:
+        color = (0,255,0)
+    
+    cv2.rectangle(frame, (x, y), (x+fill, y+height), color, -1)
+    cv2.rectangle(frame, (x, y), (x+width, y+height), (255,255,255), 2)
+    cv2.putText(frame, f"Volume: {volume}%", (x, y-5),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
 
 def main():
-    """Main function with enhanced data visualization."""
+    print("\n" + "="*50)
+    print("GESTURE CONTROL SYSTEM")
+    print("="*50)
+    print("Gestures:")
+    print("  ✋ Open Palm  - Play/Pause")
+    print("  👊 Fist       - Stop")
+    print("  👍 Thumbs Up  - Next Track")
+    print("  👎 Thumbs Down- Previous Track")
+    print("  👌 Pinch      - Volume Control")
+    print("\nControls:")
+    print("  q - Quit")
+    print("  d - Toggle debug")
+    print("  f - Toggle mirror")
+    print("="*50)
     
-    # Initialize camera
-    camera = cv2.VideoCapture(0)
-    if not camera.isOpened():
-        camera = cv2.VideoCapture(1)
-        if not camera.isOpened():
-            print("Error: Could not open camera")
-            return
+    # Camera
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        cap = cv2.VideoCapture(1)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # Detector
+    detector = HandDetector(max_hands=2)
     
-    # Initialize detector
-    detector = HandLandmarkDetector(max_hands=2)
-    
-    print("\n" + "="*60)
-    print("CONTROLS:")
-    print("  'q' - Quit")
-    print("  'd' - Toggle debug info")
-    print("  'p' - Print detailed hand data")
-    print("  'f' - Toggle mirror flip")
-    print("  'n' - Print normalized coordinates")
-    print("="*60)
-    
-    # Main loop variables
+    # Loop
+    mirror = True
+    debug = False
     fps = 0
     frame_count = 0
-    start_time = time.time()
-    debug_mode = False
-    flip_enabled = True
+    fps_time = time.time()
     
     while True:
-        # Read frame
-        ret, frame = camera.read()
+        ret, frame = cap.read()
         if not ret:
             break
         
-        # Detect hands with coordinate extraction
-        frame, hands_data = detector.find_hands(frame, draw=True, flip_type=flip_enabled)
-        
-        # Calculate FPS
+        # Process frame
+        frame, hands = detector.process_frame(frame, mirror)
         frame_count += 1
-        if time.time() - start_time >= 1:
+        
+        # FPS
+        if time.time() - fps_time >= 1:
             fps = frame_count
             frame_count = 0
-            start_time = time.time()
+            fps_time = time.time()
         
-        # Draw UI
-        cv2.putText(frame, f"FPS: {fps}", (10, 30), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # UI
+        cv2.putText(frame, f"FPS: {fps}", (10, 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+        cv2.putText(frame, f"Mirror: {'ON' if mirror else 'OFF'}", (10, 55),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0) if mirror else (0,0,255), 1)
         
-        # Flip status
-        flip_status = "ON" if flip_enabled else "OFF"
-        flip_color = (0, 255, 0) if flip_enabled else (0, 0, 255)
-        cv2.putText(frame, f"Mirror: {flip_status}", 
-                    (10, 55), cv2.FONT_HERSHEY_SIMPLEX, 0.5, flip_color, 1)
-        
-        if hands_data:
-            cv2.putText(frame, f"Hands: {len(hands_data)}", (10, 80),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # Volume
+        if hands:
+            volume = hands[0]['pinch']['volume']
+            progress = hands[0]['pinch']['progress']
+            calibrated = hands[0]['pinch']['calibrated']
             
-            if debug_mode:
-                y = 105
-                for i, hand in enumerate(hands_data):
-                    # Basic hand info
-                    text = f"H{i+1}: {hand['hand_label']} ({hand['confidence']:.2f})"
-                    cv2.putText(frame, text, (10, y), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
-                    y += 20
-                    
-                    # Show some scale-invariant features
-                    if 'scale_invariant_features' in hand:
-                        features = hand['scale_invariant_features']
-                        if 'hand_openness' in features:
-                            open_text = f"  Openness: {features['hand_openness']:.2f}"
-                            cv2.putText(frame, open_text, (10, y),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-                            y += 20
+            if not calibrated:
+                cv2.putText(frame, f"Calibrating: {progress}%", (50, frame.shape[0]-110),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,255), 1)
         else:
-            cv2.putText(frame, "No hands detected", (10, 80),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            volume = 50
         
-        # Show frame
-        cv2.imshow('Hand Detection - Task 2.4', frame)
+        draw_volume_bar(frame, volume, 50, frame.shape[0]-80, 400, 25)
         
-        # Handle keys
+        # Debug
+        if debug and hands:
+            y = 100
+            for h in hands:
+                cv2.putText(frame, f"{h['side']}: {h['gesture']}", (10, y),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,0), 1)
+                y += 20
+        
+        cv2.imshow('Gesture Control', frame)
+        
+        # Keys
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
         elif key == ord('d'):
-            debug_mode = not debug_mode
+            debug = not debug
         elif key == ord('f'):
-            flip_enabled = not flip_enabled
-            print(f"Mirror mode: {'ON' if flip_enabled else 'OFF'}")
-        elif key == ord('p') and hands_data:
-            print("\n" + "="*50)
-            print("DETAILED HAND DATA")
-            print("="*50)
-            for hand in hands_data:
-                detector.print_hand_data(hand)
-        elif key == ord('n') and hands_data:
-            print("\n" + "="*50)
-            print("NORMALIZED COORDINATES")
-            print("="*50)
-            for hand in hands_data:
-                norm_tips = detector.get_normalized_fingertip_positions(hand)
-                print(f"\n{hand['hand_label']} Hand (normalized):")
-                for finger, (x, y) in norm_tips.items():
-                    print(f"  {finger}: ({x:.3f}, {y:.3f})")
+            mirror = not mirror
     
-    # Cleanup
-    camera.release()
+    cap.release()
     cv2.destroyAllWindows()
-    print("\nProgram ended successfully.")
-
+    print("\nDone.")
 
 if __name__ == "__main__":
     main()
