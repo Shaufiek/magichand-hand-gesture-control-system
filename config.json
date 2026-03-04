@@ -1,0 +1,24 @@
+{
+    "camera": {
+        "device_id": 0,
+        "frame_width": 320,
+        "frame_height": 240
+    },
+    "gestures": {
+        "open_palm": "PLAY_PAUSE",
+        "fist": "STOP",
+        "two_fingers": "NEXT_TRACK",
+        "three_fingers": "PREVIOUS_TRACK"
+    },
+    "pinch": {
+        "min_ratio": 0.15,
+        "max_ratio": 0.65,
+        "smoothing": 0.3,
+        "step_size": 2
+    },
+    "cooldowns": {
+        "gesture_cooldown": 1.5,
+        "volume_cooldown": 0.05,
+        "stability_frames": 8
+    }
+}
