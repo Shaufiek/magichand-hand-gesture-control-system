@@ -131,13 +131,13 @@ class HandDetector:
             # Draw dots on hand
             for i, p in enumerate(lm):
                 x, y = int(p.x * w), int(p.y * h)
-                if i in [4, 8]:  # Thumb and index tips - highlight them
+                if i in [4, 8]:  # Highlight thumb and index tips
                     color = (0,255,255) if pinch['active'] else (0,255,0)
                     cv2.circle(frame, (x,y), 6, color, -1)
                 else:
                     cv2.circle(frame, (x,y), 3, (0,255,0), -1)
             
-            # Show gesture name above hand
+            # Show gesture name in the middle of the hand
             if gesture != "UNKNOWN":
                 wrist = (int(lm[0].x * w), int(lm[0].y * h))
                 names = {'OPEN_PALM': 'PLAY', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}

@@ -12,7 +12,7 @@ Control VLC media player with hand gestures using your Webcam
 ## Quick Setup
 
 ### 1. Get the code
-Put all these files in one folder named "hand-gesture-control-system":
+Put all the following files in your folder:
 - `main.py` - Detects hands and gestures
 - `media_controller.py` - Sends commands to VLC for control
 - `run.py` - Main program to start system and connect everything
@@ -28,7 +28,7 @@ A virtual environment keeps your project packages separate from other Python pro
 
 #### a. Open Terminal
 Open PowerShell (Windows) or Terminal (Mac/Linux) in your project folder:
-cd C:\hand-gesture-control-system
+cd C:\your-folder
 
 #### b. Create Virtual Environment
 In PowerShell (Windows) or Terminal (Mac/Linux) run the following command:
@@ -44,13 +44,12 @@ Open terminal in your folder and run:
 pip install -r requirements.txt
 
 ### 4. Prepare your music
-Create a music folder in your project directory and add your MP3 files:
+Create a music folder in your project directory for your music video files:
 
-text
 your-folder/
   ├── music/
-  │    ├── track1.mp3
-  │    ├── track2.mp3
+  │    ├── track1.mp4
+  │    ├── track2.mp4
   │    └── ...
   ├── main.py
   ├── run.py
@@ -67,9 +66,8 @@ Step 1: Open VLC
 
 
 
-Step 2: Run the program
-bash
-python run.py
+Step 2: Run the program by running the following Python file:
+'run.py'
 
 
 Step 3: Make gestures
