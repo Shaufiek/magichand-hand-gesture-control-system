@@ -131,7 +131,7 @@ class HandDetector:
             # Draw dots on hand
             for i, p in enumerate(lm):
                 x, y = int(p.x * w), int(p.y * h)
-                if i in [4, 8]:  # Thumb and index tips - highlight them
+                if i in [4, 8]:  # Highlight thumb and index tips
                     color = (0,255,255) if pinch['active'] else (0,255,0)
                     cv2.circle(frame, (x,y), 6, color, -1)
                 else:
