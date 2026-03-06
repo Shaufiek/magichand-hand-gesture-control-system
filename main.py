@@ -137,7 +137,7 @@ class HandDetector:
                 else:
                     cv2.circle(frame, (x,y), 3, (0,255,0), -1)
             
-            # Show gesture name above hand
+            # Show gesture name in the middle of the hand
             if gesture != "UNKNOWN":
                 wrist = (int(lm[0].x * w), int(lm[0].y * h))
                 names = {'OPEN_PALM': 'PLAY', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
