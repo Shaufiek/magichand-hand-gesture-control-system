@@ -60,7 +60,7 @@ class MediaController:
                     time.sleep(0.1)
                     self.pyautogui.keyUp(key)
             else:
-                # For track controls: quick tap
+                # For track controls we do a quick tap
                 self.pyautogui.press(key)
             return True
         except:

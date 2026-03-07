@@ -36,7 +36,7 @@ python -m venv venv
 
 #### c. Activate the Environment
 In PowerShell (Windows) or Terminal (Mac/Linux) run the following command:
-Windows: venv\Scripts\activate
+Windows: venv\Scripts\activate or venv\Scripts\Activate.ps1
 Max/Linux: source venv/bin/activate
 
 ### 3. Install required packages in your created environment
@@ -67,7 +67,7 @@ Step 1: Open VLC
 
 
 Step 2: Run the program by running the following Python file:
-'run.py'
+'run.py' or using this command in terminal: 'python run.py'
 
 
 Step 3: Make gestures

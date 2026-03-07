@@ -113,7 +113,7 @@ class HandDetector:
                     self.triggered[gesture] = True
                     self.last_trigger[gesture] = now
                     # Show friendly names in terminal
-                    names = {'OPEN_PALM': 'PLAY', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
+                    names = {'OPEN_PALM': 'PLAY/PAUSE', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
                     print(f"{names[gesture]}")
             
             self.last_gesture = gesture
@@ -140,7 +140,7 @@ class HandDetector:
             # Show gesture name in the middle of the hand
             if gesture != "UNKNOWN":
                 wrist = (int(lm[0].x * w), int(lm[0].y * h))
-                names = {'OPEN_PALM': 'PLAY', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
+                names = {'OPEN_PALM': 'PLAY/PAUSE', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
                 cv2.putText(frame, names[gesture], (wrist[0]-30, wrist[1]-30),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,255), 2)
             
