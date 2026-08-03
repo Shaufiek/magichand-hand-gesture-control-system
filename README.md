@@ -15,36 +15,33 @@ Control VLC media player with hand gestures using your Webcam
 Put all the following files in your folder:
 - `main.py` - Detects hands and gestures
 - `media_controller.py` - Sends commands to VLC for control
-- `run.py` - Main program to start system and connect everything
+- `app.py` - NEW: Web app interface
+- `run.py` - Original program (optional)
+- `run.bat` - NEW: One-click launcher for Windows
 - `config.json` - Settings
 - `requirements.txt` - Packages to install
-
 
 ### 2. Setting Up Your Python Environment
 
 #### What is a Virtual Environment?
 A virtual environment keeps your project packages separate from other Python projects.
 
-
 #### a. Open Terminal
 Open PowerShell (Windows) or Terminal (Mac/Linux) in your project folder:
 cd C:\your-folder
 
 #### b. Create Virtual Environment
-In PowerShell (Windows) or Terminal (Mac/Linux) run the following command:
 python -m venv venv
 
 #### c. Activate the Environment
-In PowerShell (Windows) or Terminal (Mac/Linux) run the following command:
-Windows: venv\Scripts\activate or venv\Scripts\Activate.ps1
-Max/Linux: source venv/bin/activate
+**Windows:** `venv\Scripts\activate` or `venv\Scripts\Activate.ps1`  
+**Mac/Linux:** `source venv/bin/activate`
 
-### 3. Install required packages in your created environment
-Open terminal in your folder and run:
+### 3. Install required packages
 pip install -r requirements.txt
 
 ### 4. Prepare your music
-Create a music folder in your project directory for your music video files:
+Create a `music` folder in your project directory for your music/video files:
 
 your-folder/
   ├── music/
@@ -52,70 +49,53 @@ your-folder/
   │    ├── track2.mp4
   │    └── ...
   ├── main.py
-  ├── run.py
+  ├── app.py
   └── ...
 
+## How to Use
 
+### Option 1: Web App (EASIEST - Recommended)
+1. **Double-click `run.bat`**
+2. Your browser will open automatically
+3. Open VLC manually and load your music
+4. Click "Start Camera" in the web app
+5. Make gestures to control VLC!
+6. Click "Stop Camera" or close the browser to quit
 
-### 5. How to use
+### Option 2: Original Program (Terminal)
+1. Run: `python run.py`
+2. Follow the terminal instructions
+3. Press 'q' in the camera window to quit
 
-Step 1: Open VLC
-- Launch VLC manually
-- Load your music/ files
-- Click on the VLC window
+## Gestures
 
+| Gesture | Command |
+|---------|---------|
+| ✋ Open Palm | Play / Pause |
+| 👊 Fist | Stop |
+| ✌️ Two Fingers | Next Track |
+| 🤟 Three Fingers | Previous Track |
+| 🤏 Pinch | Volume Control |
 
+**Pinch tip:** Close together = quieter, far apart = louder
 
-Step 2: Run the program by running the following Python file:
-'run.py' or using this command in terminal: 'python run.py'
+## Troubleshooting
 
-
-Step 3: Make gestures
-Stand in front of your camera and use these gestures:
-
-✋ Open palm:	Play / Pause
-👊 Fist:	Stop
-✌️ Two fingers:	Next track
-🤟 Three fingers:	Previous track
-🤏 Pinch:	Volume control
-
-Pinch tip: Close together = quieter, far apart = louder
-
-
-
-Step 4: Quit
-Press q in the camera window to exit
-
-
-
-### 6. Troubleshooting
-
-Gestures not working?
-
-- Make sure your hand is in good lightning
+**Gestures not working?**
+- Make sure your hand is in good lighting
 - Stand about arms-length from camera
 - Hold gestures for a second
 
-
-
-VLC not responding?
-
+**VLC not responding?**
 - Click on the VLC window to make it active
 - Check that VLC is open and playing
 
+**Camera not working?**
+- Try changing `device_id` in `config.json` from 0 to 1
 
+## Customize Settings
 
-Camera not working?
-
-- Try changing device_id in config.json from 0 to 1
-
-
-
-### 7. Customize Settings
-
-Edit config.json to adjust:
-
+Edit `config.json` to adjust:
 - Camera resolution
 - Gesture cooldown time
 - Pinch sensitivity
-

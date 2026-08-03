@@ -1,4 +1,5 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "markdown.validate.enabled": true
+    "markdown.validate.enabled": true,
+    "python-envs.defaultPackageManager": "ms-python.python:pip"
 }

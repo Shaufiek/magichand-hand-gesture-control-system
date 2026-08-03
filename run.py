@@ -80,7 +80,7 @@ def main():
         controller.handle_gesture(data)
         
         # Show camera feed
-        cv2.imshow('Live Gesture Detection Cam', frame)
+        cv2.imshow('Live Detection Cam', frame)
         
         # Check if user pressed 'q' to quit
         if cv2.waitKey(1) & 0xFF == ord('q'):
