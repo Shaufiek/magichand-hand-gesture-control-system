@@ -1,8 +1,6 @@
-"""
-Gesture Media Control - Web App
-A simple web interface for the hand gesture control system
-"""
+# Web interface for the system
 
+# Import essential libraries
 import streamlit as st
 import cv2
 import time
@@ -13,8 +11,7 @@ from media_controller import MediaController
 
 # Page configuration
 st.set_page_config(
-    page_title="Gesture Media Control",
-    page_icon="🖐️",
+    page_title="MagicHand",
     layout="wide"
 )
 
@@ -22,39 +19,71 @@ st.set_page_config(
 with open("config.json", 'r') as f:
     config = json.load(f)
 
-# Title and description
-st.title("🖐️ Gesture Media Control")
-st.markdown("Control VLC with hand gestures using your webcam")
+LOGO_PATH = "magichand_logo.png"
 
-# Sidebar with instructions
+def display_logo(size=200):
+    """Display the MagicHand logo"""
+    # Check if logo file exists locally
+    if os.path.exists(LOGO_PATH):
+        st.image(LOGO_PATH, width=size)
+    else:
+        # Fallback: show emoji if no logo found
+        st.markdown(f"<h1 style='font-size: {size//2}px; text-align: center;'>🖐️</h1>", unsafe_allow_html=True)
+
+# Top header
+st.markdown("<br>", unsafe_allow_html=True)  # Small spacing at top
+
+# Logo centered
+col_logo_center = st.columns([1, 1, 1])
+with col_logo_center[1]: 
+    display_logo(200)
+
+# Subtitle centered below logo
+st.markdown("""
+<div style='text-align: center;'>
+    <p style='font-size: 22px; font-weight: 300; color: #aaa; margin-top: -5px;'>
+         controleer jouw muziek/video's met simpele hand gebaren
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)  # Small spacing after header
+    
 with st.sidebar:
-    st.header("📋 Instructions")
+    # Logo at top of sidebar
+    col_logo_center = st.columns([1, 5, 1])
+    with col_logo_center[1]: 
+        display_logo(200)
+    st.divider()
+    
+    st.header("📋 Instructies")
     st.markdown("""
-    ### Step 1: Open VLC
-    - Open VLC manually
-    - Load your music or videos
-    - **Click on the VLC window** to make it active
+    ### Stap 1: Open VLC-mediaplayer
+    - Open VLC-media player op je desktop
+    - Laad jouw muziek/video's
     
-    ### Step 2: Start Camera
-    - Click the "Start Camera" button below
-    - Stand in front of your webcam
+    ### Stap 2 : Start Camera
+    - Click de "Start Camera" knop op de web-app
+    - Sta voor jouw camera
     
-    ### Step 3: Make Gestures
+    ### Stap 3: Maak Gebaren
     
-    | Gesture | Command |
+    - **Click op de VLC-mediaplayer venster** om hem als actief te houden
+    
+    | Gebaar | Actie |
     |---------|---------|
-    | ✋ Open Palm | Play / Pause |
-    | 👊 Fist | Stop |
-    | ✌️ Two Fingers | Next Track |
-    | 🤟 Three Fingers | Previous Track |
-    | 🤏 Pinch | Volume Control |
+    | ✋ High-Five | Play / Pause |
+    | 👊 Vuist | Stop |
+    | ✌️ 2 Vingers | Volgende Track |
+    | 🤟 3 Vingers | Vorige Track |
+    | 🤏 Duim en Wijsvinger Knepen | Volume Controlle |
     
-    ### Step 4: Stop
-    - Click "Stop Camera" or press 'q'
+    ### Step 4: Stop MagicHand
+    - Click "Stop Camera"
     """)
     
     st.divider()
-    st.caption("Made with ❤️ for accessible media control")
+    st.caption("Gemaakt met ❤️ voor eenvoudige media controlle")
 
 # Initialize session state
 if 'running' not in st.session_state:
@@ -69,6 +98,10 @@ if 'last_gesture' not in st.session_state:
     st.session_state.last_gesture = ""
 if 'volume' not in st.session_state:
     st.session_state.volume = 50
+if 'volume_direction' not in st.session_state:
+    st.session_state.volume_direction = "" 
+if 'volume_display_time' not in st.session_state:
+    st.session_state.volume_display_time = 0
 
 # Placeholder for camera feed
 frame_placeholder = st.empty()
@@ -100,7 +133,7 @@ if start_btn:
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam["frame_height"])
     st.session_state.cap = cap
     
-    status_placeholder.success("✅ Camera started! Make gestures to control VLC.")
+    status_placeholder.success("Camera is begonnen! maak gebaren om VLC-mediaplayer te controlleren.")
 
 # Stop camera
 if stop_btn:
@@ -108,25 +141,25 @@ if stop_btn:
     if st.session_state.cap:
         st.session_state.cap.release()
         st.session_state.cap = None
-    status_placeholder.info("⏹️ Camera stopped")
+    status_placeholder.info("⏹️ Camera gestopt")
     frame_placeholder.empty()
     gesture_placeholder.empty()
     volume_placeholder.empty()
     st.rerun()
 
-# Main loop (only when running)
+# Main loop 
 if st.session_state.running and st.session_state.cap:
     cap = st.session_state.cap
     detector = st.session_state.detector
     controller = st.session_state.controller
     
-    # Show VLC reminder
-    st.warning("⚠️ Make sure VLC is open and the window is active!")
+    # Show  reminder
+    st.warning("⚠️ Zorg ervoor dat VLC-mediaplayer geopend is en het venster actief is!")
     
     # Create a container for the video
     video_container = st.empty()
     gesture_text = st.empty()
-    volume_bar = st.empty()
+    volume_text = st.empty()
     
     # Frame processing loop
     try:
@@ -134,7 +167,7 @@ if st.session_state.running and st.session_state.cap:
             # Read frame
             ret, frame = cap.read()
             if not ret:
-                status_placeholder.error("⚠️ Camera error - please restart")
+                status_placeholder.error("⚠️ Camera error. a.u.b. restarten")
                 break
             
             # Process frame for gestures
@@ -145,20 +178,25 @@ if st.session_state.running and st.session_state.cap:
             
             # Get gesture and volume info
             gesture = data.get('gesture', 'UNKNOWN')
-            pinch = data.get('pinch', {'active': False, 'volume': 50})
+            pinch = data.get('pinch', {'active': False, 'volume': 50, 'direction': ''})
             
             # Map gesture to friendly name
             gesture_names = {
-                'OPEN_PALM': '✋ PLAY/PAUSE',
+                'OPEN_PALM': '✋ PLAY / PAUSE',
                 'FIST': '👊 STOP',
-                'TWO_FINGERS': '✌️ NEXT',
-                'THREE_FINGERS': '🤟 PREV',
-                'UNKNOWN': '👋 Waiting...'
+                'TWO_FINGERS': '✌️ VOLGENDE',
+                'THREE_FINGERS': '🤟 VORIGE',
+                'UNKNOWN': '👋 Aan het wachten voor gebaar...'
             }
-            gesture_display = gesture_names.get(gesture, '👋 Waiting...')
+            gesture_display = gesture_names.get(gesture, '👋 Aan het wachten...')
             
             # Update session volume
             st.session_state.volume = pinch['volume']
+            
+            # Track volume direction
+            if pinch['active'] and pinch.get('direction', ''):
+                st.session_state.volume_direction = pinch['direction']
+                st.session_state.volume_display_time = time.time()
             
             # Convert BGR to RGB for Streamlit display
             frame_rgb = cv2.cvtColor(processed_frame, cv2.COLOR_BGR2RGB)
@@ -167,29 +205,38 @@ if st.session_state.running and st.session_state.cap:
             video_container.image(frame_rgb, channels="RGB", use_container_width=True)
             
             # Display gesture
-            gesture_text.markdown(f"### 🎯 Gesture: {gesture_display}")
+            gesture_text.markdown(f"### 🎯 Gebaar: {gesture_display}")
             
-            # Display volume bar
-            volume = pinch['volume']
-            if volume < 30:
-                color = "red"
-            elif volume < 70:
-                color = "orange"
+            # Show volume direction only when pinching
+            if pinch['active'] and pinch.get('direction', ''):
+                direction = pinch['direction']
+                if direction == 'Higher':
+                    volume_text.markdown(f"""
+                    <div style="background-color: #1a1a2e; padding: 15px; border-radius: 10px; text-align: center; border: 2px solid #00ff88;">
+                        <p style="margin: 0; font-size: 28px; font-weight: bold; color: #00ff88;">
+                            🔊 VOLUME <span style="color: #ff6b6b; font-size: 32px;">▲</span>
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #888;">Volume omhoog</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif direction == 'Lower':
+                    volume_text.markdown(f"""
+                    <div style="background-color: #1a1a2e; padding: 15px; border-radius: 10px; text-align: center; border: 2px solid #ff6b6b;">
+                        <p style="margin: 0; font-size: 28px; font-weight: bold; color: #ff6b6b;">
+                            🔊 VOLUME <span style="color: #00ff88; font-size: 32px;">▼</span>
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #888;">Volume omlaag</p>
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
-                color = "green"
-            
-            volume_bar.markdown(f"""
-            <div style="background-color: #333; padding: 10px; border-radius: 10px;">
-                <p style="margin: 0; font-weight: bold;">🔊 Volume: {volume}%</p>
-                <div style="background-color: #555; border-radius: 5px; height: 20px; width: 100%;">
-                    <div style="background-color: {color}; border-radius: 5px; height: 100%; width: {volume}%;"></div>
+                # Show waiting state when not pinching
+                volume_text.markdown(f"""
+                <div style="background-color: #1a1a2e; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #555;">
+                    <p style="margin: 0; font-size: 18px; color: #888;">
+                        🤏 Knijp duim en wijsvinger voor volume controle
+                    </p>
                 </div>
-                <p style="margin: 0; font-size: 12px; color: #888;">Pinch closer = quieter, further = louder</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Check for quit key (in browser)
-            # Note: 'q' key detection works via the stop button
+                """, unsafe_allow_html=True)
             
             # Small delay to prevent CPU overload
             time.sleep(0.03)
@@ -210,9 +257,9 @@ if not st.session_state.running and st.session_state.cap:
 # Show footer
 st.divider()
 st.caption("""
-**Tips:** 
-- Make sure your hand is well-lit
-- Stand about arms-length from camera  
-- Hold gestures for a moment
-- Click VLC window first!
+**Tips :** 
+- Zorg ervoor dat je hand goed verlicht is
+- Ga op ongeveer armlengte afstand van de camera staan
+- Houd gebaren even vast
+- Vergeet niet te blijven op VLC-venster tijdens het maken van gebaren!
 """)
