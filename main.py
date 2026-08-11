@@ -112,9 +112,6 @@ class HandDetector:
                 if now - self.last_trigger.get(gesture, 0) > self.cooldown:
                     self.triggered[gesture] = True
                     self.last_trigger[gesture] = now
-                    # Show friendly names in terminal
-                    names = {'OPEN_PALM': 'PLAY/PAUSE', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
-                    print(f"{names[gesture]}")
             
             self.last_gesture = gesture
             
@@ -136,13 +133,6 @@ class HandDetector:
                     cv2.circle(frame, (x,y), 6, color, -1)
                 else:
                     cv2.circle(frame, (x,y), 3, (0,255,0), -1)
-            
-            # Show gesture name in the middle of the hand
-            if gesture != "UNKNOWN":
-                wrist = (int(lm[0].x * w), int(lm[0].y * h))
-                names = {'OPEN_PALM': 'PLAY/PAUSE', 'FIST': 'STOP', 'TWO_FINGERS': 'NEXT', 'THREE_FINGERS': 'PREV'}
-                cv2.putText(frame, names[gesture], (wrist[0]-30, wrist[1]-30),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,255), 2)
             
             # Draw a line between thumb and index when pinching
             if pinch['active']:
@@ -218,7 +208,7 @@ class HandDetector:
         return "UNKNOWN"
 
     def _get_pinch(self, pts):
-        """Measure thumb-index pinch for volume control"""
+        """Measure thumb - index pinch for volume control"""
         if len(pts) < 21:
             return {'active': False, 'volume': self.current_volume, 'direction': ''}
         

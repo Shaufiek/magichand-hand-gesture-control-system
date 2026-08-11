@@ -1,22 +1,22 @@
 @echo off
 echo =========================================
-echo  Gesture Media Control System
+echo  MagicHand
 echo =========================================
 echo.
-echo Make sure VLC is open and ready!
+echo Zorg ervoor dat VLC-mediaspeler geopend en klaar voor gebruik is!
 echo.
-echo Activating virtual environment...
+echo Virtuele omgeving aan het activeren...
 echo.
 
 REM Activate the virtual environment
 call venv\Scripts\activate.bat
 
-echo Starting web app...
+echo Web-applicatie aan het openen...
 echo.
 streamlit run app.py
 
 echo.
 echo =========================================
-echo  App closed. Thank you for using!
+echo  Web-applicatie gesloten . Bedankt voor het gebruik maken van MagicHand!
 echo =========================================
 pause
