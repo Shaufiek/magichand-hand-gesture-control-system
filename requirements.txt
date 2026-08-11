@@ -1,9 +1,9 @@
-# run the following command in your environment to install required packages for this project : 
+ # run the following command in your terminal and environment to instal required packages for this project : 
 # pip install -r requirements.txt
 
 
 opencv-python==4.13.0.92 # Camera and image processing
-mediapipe==0.10.32 # Hand detection
-pyautogui==0.9.54 # Keyboard control for VLC
+mediapipe==0.10.32 #  Hand detection
+pyautogui==0.9.54 # Keyboard control  for VLC
 numpy==2.4.2 # Math calculations
 streamlit==1.41.1 # Web app interface

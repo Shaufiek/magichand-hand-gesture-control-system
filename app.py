@@ -1,6 +1,6 @@
-# Web interface for the system using streamlit
+# Web  interface for the  system using streamlit
 
-# Import essential libraries
+# Import esential libraries
 import streamlit as st
 import cv2
 import time
@@ -9,7 +9,7 @@ import json
 from main import HandDetector
 from media_controller import MediaController
 
-# Page configuration
+#  Page configuration
 st.set_page_config(
     page_title="MagicHand",
     layout="centered"
@@ -17,12 +17,12 @@ st.set_page_config(
 
 # Config manager functions
 def load_config():
-    """Load settings from config.json"""
+    """Load settings from config.json """
     with open("config.json", 'r') as f:
         return json.load(f)
 
 def save_config(config):
-    """Save settings to config.json"""
+    """Save settings to  config.json"""
     with open("config.json", 'w') as f:
         json.dump(config, f, indent=4)
 
@@ -396,15 +396,15 @@ if page == "🏠 Homepagina":
     - Vergeet niet te blijven op VLC-mediaspeler venster tijdens het maken van gebaren
     """)
 
-# ===== UILEG PAGINA =====
+# Uitleg pagina
 elif page == "📖 Uitleg":
     st.title("📖 Uitleg")
     st.markdown("Bekijk hier hoe je de gebaren moet maken om MagicHand te gebruiken.")
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # ===== VIDEO =====
+    # Video
     st.subheader("🎬 Uitlegvideo")
-    st.markdown("Bekijk de video om te zien hoe je de gebaren maakt:")
+    st.markdown("Bekijk de video om te zien hoe je de gebaren maakt :")
     
     # Vervang met jouw eigen video link
     video_url = "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
@@ -412,9 +412,8 @@ elif page == "📖 Uitleg":
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # ===== VOORBEELD AFBEELDINGEN =====
-    st.subheader("🖐️ Voorbeelden van Gebaren")
-    st.markdown("Hieronder zie je hoe elk gebaar eruitziet:")
+    # Voorbeeld afbeeldingen
+    st.subheader("🖐️ Voorbeeld afbeeldingen van de Gebaren")
     
     # Maak 2 rijen met 2 afbeeldingen per rij
     col1, col2 = st.columns(2)
