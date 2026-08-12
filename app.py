@@ -8,6 +8,10 @@ import os
 import json
 from main import HandDetector
 from media_controller import MediaController
+import warnings
+warnings.filterwarnings('ignore')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['GLOG_minloglevel'] = '2'
 
 #  Page configuration
 st.set_page_config(
@@ -421,21 +425,34 @@ elif page == "📖 Toelichting":
     with col1:
         st.markdown("**✋ High-Five**")
         # Photopath
-        st.image("placeholder_open_palm.png", use_container_width=True)
+        st.image("high_five.png", use_container_width=True)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
     with col2:
         st.markdown("**👊 Vuist**")
-        st.image("placeholder_fist.png", use_container_width=True)
+        st.image("fist.png", use_container_width=True)
     
     col3, col4 = st.columns(2)
     
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     with col3:
         st.markdown("**✌️ 2 Vingers**")
-        st.image("placeholder_two_fingers.png", use_container_width=True)
+        st.image("two_fingers.png", use_container_width=True)
     
     with col4:
         st.markdown("**🤟 3 Vingers**")
-        st.image("placeholder_three_fingers.png", use_container_width=True)
+        st.image("three_fingers.png", use_container_width=True)
+        
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Make a single centered column for the pinch gesture
+    col5, col6, col7 = st.columns([1, 2, 1])
+    with col6:
+        st.markdown("**🤏 Duim en Wijsvinger knijpen ( Volume Controlle )**")
+        st.image("pinching.png", use_container_width=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     st.info("💡 Tip: Zorg voor  voldoende licht op je  hand en sta op armlengte afstand van de camera ")

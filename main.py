@@ -7,6 +7,11 @@ import math
 import time
 import os
 import json
+import warnings
+warnings.filterwarnings('ignore')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['GLOG_minloglevel'] = '2'
+
 
 # Load settings
 def load_config():
@@ -115,8 +120,6 @@ class HandDetector:
             pinch = self._get_pinch(pts)
             if pinch['active']:
                 self.current_volume = pinch['volume']
-                if pinch['direction']:
-                    print(f"Volume {pinch['direction']}")
             
             gesture_data = {'gesture': gesture, 'pinch': pinch}
             
