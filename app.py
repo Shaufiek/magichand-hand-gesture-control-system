@@ -22,26 +22,26 @@ def load_config():
         return json.load(f)
 
 def save_config(config):
-    """Save settings to  config.json"""
+    """Save settings  to  config.json"""
     with open("config.json", 'w') as f:
         json.dump(config, f, indent=4)
 
 # Load config
 config = load_config()
 
-# Load UI scale from config
+# Load  UI scale from  config
 ui_scale = config.get("ui", {}).get("scale", 1.0)
 
 LOGO_PATH = "magichand_logo.png"
 
 def display_logo(size=200):
-    """Display the MagicHand logo"""
+    """ Display the MagicHand logo """
     if os.path.exists(LOGO_PATH):
         st.image(LOGO_PATH, width=int(size * ui_scale))
     else:
         st.markdown(f"<h1 style='font-size: {int((size//2) * ui_scale)}px; text-align: center;'>🖐️</h1>", unsafe_allow_html=True)
 
-# ===== CUSTOM CSS WITH UI_SCALE =====
+# Custom CSS with UI - scaling
 st.markdown(f"""
 <style>
     /* Bigger buttons */
@@ -141,7 +141,7 @@ st.markdown(f"""
 
 #  Sidebar
 with st.sidebar:
-    # Logo at top of sidebar
+    #Logo  at top of sidebar
     col_logo_center = st.columns([1, 1, 1])
     with col_logo_center[1]: 
         display_logo(200)
@@ -153,7 +153,7 @@ with st.sidebar:
 
     page = st.radio(
         ".",
-        ["🏠 Homepagina", "📖 Uitleg", "⚙️ Instellingen"],
+        ["🏠 Homepagina", "📖 Toelichting", "⚙️ Instellingen"],
         index=0,
         label_visibility="collapsed"
     )
@@ -163,16 +163,16 @@ with st.sidebar:
         st.header("📋 Instructies")
         st.markdown("""
         ### Stap 1: Open VLC-mediaspeler
-        - Open VLC-mediaspeler op je desktop
-        - Laad jouw muziek/video's
+        - Open VLC-mediaspeler  op je desktop
+        - Laad  jouw muziek/video's
         
         ### Stap 2 : Start Camera
-        - Click de "Start Camera" knop op de web-app
-        - Sta voor jouw camera
+        - Click de " Start Camera" knop op de web-app
+        - Sta  voor jouw camera
         
         ### Stap 3: Maak Gebaren
         
-        - **Click op de VLC-mediaspeler venster** om hem als actief te  houden
+        - **Click op  de VLC-mediaspeler venster** om hem als actief te  houden
         
         
         **Standaard Gebaar Handleiding**:
@@ -181,12 +181,12 @@ with st.sidebar:
         |---------|---------|
         | ✋ High-Five | Play / Pause |
         | 👊 Vuist | Stop |
-        | ✌️ 2 Vingers | Volgende Track |
+        | ✌️ 2 Vingers |  Volgende Track |
         | 🤟 3 Vingers | Vorige Track |
-        | 🤏 Duim en Wijsvinger Knepen | Volume Controlle |
+        | 🤏 Duim en Wijsvinger Knepen | Volume  Controlle |
         
         ### Step 4: Stop MagicHand
-        - Click "Stop Camera"
+        -  Click " Stop Camera"
         """)
         
         st.divider()
@@ -194,7 +194,7 @@ with st.sidebar:
 
 #   Homepage
 if page == "🏠 Homepagina":
-    # Top header
+    #  Top header
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Logo centered
@@ -202,7 +202,7 @@ if page == "🏠 Homepagina":
     with col_logo_center[1]: 
         display_logo(200)
 
-    # Subtitle centered below logo
+    # Subtitle centered below  logo
     st.markdown(f"""
     <div style='text-align: center;'>
         <p style='font-size: {int(28 * ui_scale)}px; font-weight: 300; color: #aaa; margin-top: -5px;'>
@@ -213,7 +213,7 @@ if page == "🏠 Homepagina":
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Initialize session state
+    #Initialize sesion state
     if 'running' not in st.session_state:
         st.session_state.running = False
     if 'detector' not in st.session_state:
@@ -246,7 +246,7 @@ if page == "🏠 Homepagina":
     with col2:
         stop_btn = st.button("⏹️ Stop Camera", use_container_width=True)
 
-    # Start camera
+    # Start  camera
     if start_btn:
         st.session_state.running = True
         st.session_state.controller = MediaController()
@@ -261,7 +261,7 @@ if page == "🏠 Homepagina":
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam["frame_height"])
         st.session_state.cap = cap
         
-        status_placeholder.success("Camera is begonnen! maak gebaren om VLC-mediaspeler te controleren.")
+        status_placeholder.success("Camera is begonnen. maak gebaren om VLC-mediaspeler te controleren.")
 
     # Stop camera
     if stop_btn:
@@ -282,23 +282,23 @@ if page == "🏠 Homepagina":
         controller = st.session_state.controller
         
         # Show reminder
-        st.warning("⚠️ Zorg ervoor dat VLC-mediaspeler geopend is en het venster actief is!")
+        st.warning("⚠️ Zorg ervoor dat VLC-mediaspeler geopend is en als actieve venster is!")
         
-        # Create a container for the video
+        #Create a container for the video
         video_container = st.empty()
         gesture_text = st.empty()
         volume_text = st.empty()
         
-        # Frame processing loop
+        # Frame  processing loop
         try:
             while st.session_state.running:
                 # Read frame
                 ret, frame = cap.read()
                 if not ret:
-                    status_placeholder.error("⚠️ Camera error . a.u.b. restarten")
+                    status_placeholder.error(" ⚠️ Camera error . a.u.b. restarten")
                     break
                 
-                # Process frame for gestures
+                # Process  frame for  gestures
                 processed_frame, data = detector.process_frame(frame, mirror=True)
                 
                 # Send commands to VLC
@@ -310,10 +310,10 @@ if page == "🏠 Homepagina":
                 
                 # Map gesture to friendly name
                 gesture_names = {
-                    'OPEN_PALM': '✋',
-                    'FIST': '👊',
-                    'TWO_FINGERS': '✌️',
-                    'THREE_FINGERS': '🤟',
+                    'OPEN_PALM': '✋ High-Five',
+                    'FIST': '👊 Vuist',
+                    'TWO_FINGERS': '✌️2 Vingers',
+                    'THREE_FINGERS': '🤟 3 Vingers',
                     'UNKNOWN': '👋 Aan het wachten voor gebaar...'
                 }
                 gesture_display = gesture_names.get(gesture, '👋 Aan het wachten...')
@@ -321,25 +321,25 @@ if page == "🏠 Homepagina":
                 # Update session volume
                 st.session_state.volume = pinch['volume']
                 
-                # Track volume direction
+                #Track volume direction
                 if pinch['active'] and pinch.get('direction', ''):
                     st.session_state.volume_direction = pinch['direction']
                     st.session_state.volume_display_time = time.time()
                 
-                # Convert BGR to RGB for Streamlit display n
+                # Convert  BGR to  RGB for Streamlit display
                 frame_rgb = cv2.cvtColor(processed_frame, cv2.COLOR_BGR2RGB)
                 
-                # Display the frame
+                # Display  the frame
                 video_container.image(frame_rgb, channels="RGB", use_container_width=True)
                 
-                # Display gestureE
+                # Display gesture
                 gesture_text.markdown(f"""
                 <div style='font-size: {int(36 * ui_scale)}px; font-weight: bold; padding: {int(10 * ui_scale)}px;'>
-                    🎯 Gebaar: {gesture_display}
+                    Gebaar: {gesture_display}
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Show volume direction only when pinching
+                #  Show volume direction only when pinching
                 if pinch['active'] and pinch.get('direction', ''):
                     direction = pinch['direction']
                     if direction == 'Higher':
@@ -365,7 +365,7 @@ if page == "🏠 Homepagina":
                     volume_text.markdown(f"""
                     <div style="background-color: #1a1a2e; padding: {int(20 * ui_scale)}px; border-radius: 10px; text-align: center; border: 1px solid #555;">
                         <p style="margin: 0; font-size: {int(24 * ui_scale)}px; color: #888;">
-                            🤏 Knijp duim en wijsvinger voor volume controle
+                            🤏 Knijp je duim en wijsvinger voor volume controle
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -386,65 +386,65 @@ if page == "🏠 Homepagina":
         st.session_state.cap = None
         cv2.destroyAllWindows()
 
-    # Show footer
+    #Show footer
     st.divider()
     st.caption("""
     **Tips :** 
-    - Zorg ervoor dat je hand goed verlicht is
-    - Ga op ongeveer armlengte afstand van de camera staan
+    - Zorg ervoor dat je hand goed  verlicht is
+    - Ga op ongeveer armlengte  afstand van de camera staan
     - Houd gebaren even vast
-    - Vergeet niet te blijven op VLC-mediaspeler venster tijdens het maken van gebaren
+    -  Vergeet niet te blijven  op VLC-mediaspeler venster  tijdens het maken van gebaren
     """)
 
-# Uitleg pagina
-elif page == "📖 Uitleg":
-    st.title("📖 Uitleg")
-    st.markdown("Bekijk hier hoe je de gebaren moet maken om MagicHand te gebruiken.")
+# Explanation page
+elif page == "📖 Toelichting":
+    st.title("📖 Toelichting")
+    st.markdown("Bekijk hieronder  hoe je de gebaren  correct moet maken om MagicHand te gebruiken.")
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Video
     st.subheader("🎬 Uitlegvideo")
-    st.markdown("Bekijk de video om te zien hoe je de gebaren maakt :")
+    st.markdown(" Bekijk de video om te zien  hoe je de gebaren maakt :")
     
-    # Vervang met jouw eigen video link
+    #  video link
     video_url = "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
     st.video(video_url)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Voorbeeld afbeeldingen
+    # Example pictures 
     st.subheader("🖐️ Voorbeeld afbeeldingen van de Gebaren")
     
-    # Maak 2 rijen met 2 afbeeldingen per rij
+    # Make 2 rows with  2 photo 's per row
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**✋ High-Five (Play / Pause)**")
-        # Vervang met jouw eigen afbeeldingspad
+        st.markdown("**✋ High-Five**")
+        # Photopath
         st.image("placeholder_open_palm.png", use_container_width=True)
     
     with col2:
-        st.markdown("**👊 Vuist (Stop)**")
+        st.markdown("**👊 Vuist**")
         st.image("placeholder_fist.png", use_container_width=True)
     
     col3, col4 = st.columns(2)
     
     with col3:
-        st.markdown("**✌️ 2 Vingers (Volgende Track)**")
+        st.markdown("**✌️ 2 Vingers**")
         st.image("placeholder_two_fingers.png", use_container_width=True)
     
     with col4:
-        st.markdown("**🤟 3 Vingers (Vorige Track)**")
+        st.markdown("**🤟 3 Vingers**")
         st.image("placeholder_three_fingers.png", use_container_width=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
-    st.info("💡 Tip: Zorg voor voldoende licht op je hand en sta op armlengte afstand van de camera.")
+    st.info("💡 Tip: Zorg voor  voldoende licht op je  hand en sta op armlengte afstand van de camera ")
 
-# Settingspagina
+# Settings pagina
 elif page == "⚙️ Instellingen":
     st.title("⚙️ Instellingen")
     
-    # Load current config
+    #  Load current config
     current_config = load_config()
     
     # Create a form for settings
@@ -457,7 +457,7 @@ elif page == "⚙️ Instellingen":
                 "Camera Apparaat",
                 options=[0, 1],
                 index=current_config["camera"]["device_id"],
-                help="0 = ingebouwde camera , 1 = externe camera"
+                help=" 0 = ingebouwde camera , 1 = externe camera"
             )
         
         with col2:
@@ -471,12 +471,12 @@ elif page == "⚙️ Instellingen":
             )
         
         st.divider()
-        st.subheader("✌️ Gebaar voor Actie in VLC-mediaspeler")
+        st.subheader(" ✌️ Gebaar voor Actie  in VLC-mediaspeler")
         
-        # Get current gesture mapping
+        #Get current gesture mapping
         gestures = current_config.get("gestures", {})
         
-        # Define available commands
+        # Define  available commands
         command_options = ["PLAY_PAUSE", "STOP", "NEXT_TRACK", "PREVIOUS_TRACK"]
         command_labels = {
             "PLAY_PAUSE": "▶️ Play / Pause",
@@ -485,7 +485,7 @@ elif page == "⚙️ Instellingen":
             "PREVIOUS_TRACK": "⏮️ Vorige Track"
         }
         
-        # Gesture mapping with friendly names
+        # Gesture mapping  with friendly names
         gesture_friendly = {
             "open_palm": "✋ High-Five",
             "fist": "👊 Vuist",
@@ -493,7 +493,7 @@ elif page == "⚙️ Instellingen":
             "three_fingers": "🤟 3 Vingers"
         }
         
-        # Show dropdown for each gesture
+        # Show  dropdown for each gesture
         gesture_settings = {}
         col1, col2 = st.columns(2)
         
@@ -520,7 +520,7 @@ elif page == "⚙️ Instellingen":
                     )
         
         st.divider()
-        st.subheader("⏱️ Wachttijd Instellingen")
+        st.subheader("⏱️ Wachttijd  Instellingen")
         
         col1, col2 = st.columns(2)
         with col1:
@@ -530,17 +530,17 @@ elif page == "⚙️ Instellingen":
                 max_value=5.0,
                 value=float(current_config["cooldowns"]["gesture_cooldown"]),
                 step=0.5,
-                help="Tijd tussen hetzelfde gebaar voordat het opnieuw kan worden geactiveerd"
+                help="Tijd tussen  hetzelfde gebaar voordat  het opnieuw kan worden geactiveerd"
             )
         
         with col2:
             volume_cooldown = st.slider(
-                "Volume Wachttijd (seconden)",
+                "Volume Wachttijd ( seconden )",
                 min_value=0.01,
                 max_value=0.2,
                 value=float(current_config["cooldowns"]["volume_cooldown"]),
                 step=0.01,
-                help="Tijd tussen volume aanpassingen. Lager = sneller en hoger = soepeler"
+                help="Tijd tussen volume aanpassingen . Lager = sneller en hoger = soepeler"
             )
         
         col1, col2 = st.columns(2)
@@ -551,7 +551,7 @@ elif page == "⚙️ Instellingen":
                 max_value=20,
                 value=int(current_config["cooldowns"]["stability_frames"]),
                 step=1,
-                help="Aantal frames dat een gebaar vastgehouden moet worden voordat het triggert"
+                help="Aantal  frames dat een  gebaar vastgehouden moet worden voordat het triggert "
             )
         
         st.divider()
@@ -565,23 +565,23 @@ elif page == "⚙️ Instellingen":
                 max_value=0.5,
                 value=float(current_config["pinch"]["min_ratio"]),
                 step=0.01,
-                help="Waarde wanneer vingers volledig geknepen zijn. Een lagere waarde = gevoeliger"
+                help=" Waarde wanneer vingers volledig  geknepen zijn. Een lagere waarde  = gevoeliger "
             )
         
         with col2:
             max_ratio = st.slider(
-                "Maximale Pinch Ratio",
+                "Maximale  Pinch Ratio",
                 min_value=0.3,
                 max_value=1.0,
                 value=float(current_config["pinch"]["max_ratio"]),
                 step=0.01,
-                help="Waarde wanneer vingers volledig open zijn. Een hogere waarde = meer bereik"
+                help="Waarde wanneer  vingers volledig open zijn. Een hogere waarde = meer bereik"
             )
         
         col1, col2 = st.columns(2)
         with col1:
             smoothing = st.slider(
-                "Smoothing",
+                "Smoothing ",
                 min_value=0.0,
                 max_value=1.0,
                 value=float(current_config["pinch"]["smoothing"]),
@@ -591,7 +591,7 @@ elif page == "⚙️ Instellingen":
         
         with col2:
             step_size = st.slider(
-                "Volume Stap Grootte",
+                "Volume  Stap Grootte",
                 min_value=1,
                 max_value=10,
                 value=int(current_config["pinch"]["step_size"]),
@@ -601,7 +601,7 @@ elif page == "⚙️ Instellingen":
         
         st.divider()
         
-        # ===== UI SCALE SETTING =====
+        # UI- scale setting
         st.subheader("🔍 Weergave Instellingen")
         
         ui_scale_slider = st.slider(
@@ -610,7 +610,7 @@ elif page == "⚙️ Instellingen":
             max_value=2.0,
             value=float(current_config.get("ui", {}).get("scale", 1.0)),
             step=0.1,
-            help="1.0 = normaal, 1.5 = groter, 2.0 = heel groot"
+            help="1.0 = normaal , 1.5  = groter , 2.0 = heel groot "
         )
         
         st.divider()
@@ -622,7 +622,7 @@ elif page == "⚙️ Instellingen":
     
     # Handle save
     if save_btn:
-        # Build new config
+        #Build  new config
         width, height = map(int, resolution.split('x'))
         
         new_config = {
@@ -651,9 +651,9 @@ elif page == "⚙️ Instellingen":
         # Save settings to config.json file
         save_config(new_config)
         
-        # Update the global config variable
+        #  Update the global config variable
         config = load_config()
         
-        st.success("✅ Instellingen zijn opgeslagen.")
-        st.info("🔄 Klik op 'Stop Camera' en daarna op 'Start Camera' om de nieuwe instellingen te gebruiken. De UI-schaal wordt toegepast na herstart van de app.")
+        st.success("✅ Instellingen zijn  opgeslagen. ")
+        st.info("Herstart de applicatie  om de  nieuwe instellingen te gebruiken . ")
         st.balloons()
