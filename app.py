@@ -165,6 +165,7 @@ with st.sidebar:
     
     if page == "🏠 Homepagina":
         st.header("📋 Instructies")
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("""
         ### Stap 1: Open VLC-mediaspeler
         - Open VLC-mediaspeler  op je desktop
@@ -187,7 +188,7 @@ with st.sidebar:
         | 👊 Vuist | Stop |
         | ✌️ 2 Vingers |  Volgende Track |
         | 🤟 3 Vingers | Vorige Track |
-        | 🤏 Duim en Wijsvinger Knepen | Volume  Controlle |
+        | 🤏 Duim en Wijsvinger Knijpen | Volume  Controlle |
         
         ### Step 4: Stop MagicHand
         -  Click " Stop Camera"
@@ -250,19 +251,22 @@ if page == "🏠 Homepagina":
     with col2:
         stop_btn = st.button("⏹️ Stop Camera", use_container_width=True)
 
-    # Start  camera
+    # Camera Start
     if start_btn:
         st.session_state.running = True
         st.session_state.controller = MediaController()
         st.session_state.detector = HandDetector()
         
-        # Open camera
+        # Open camera 
         cam = config["camera"]
         cap = cv2.VideoCapture(cam["device_id"])
         if not cap.isOpened():
             cap = cv2.VideoCapture(1)
+        
+        #  basis instellingen
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, cam["frame_width"])
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam["frame_height"])
+        
         st.session_state.cap = cap
         
         status_placeholder.success("Camera is begonnen. maak gebaren om VLC-mediaspeler te controleren.")
@@ -279,14 +283,14 @@ if page == "🏠 Homepagina":
         volume_placeholder.empty()
         st.rerun()
 
-    # Main loop 
+    # Main  loop
     if st.session_state.running and st.session_state.cap:
         cap = st.session_state.cap
         detector = st.session_state.detector
         controller = st.session_state.controller
         
         # Show reminder
-        st.warning("⚠️ Zorg ervoor dat VLC-mediaspeler geopend is en als actieve venster is!")
+        st.warning("⚠️ Zorg ervoor dat VLC-mediaspeler geopend is en als actieve venster is !")
         
         #Create a container for the video
         video_container = st.empty()
@@ -296,11 +300,12 @@ if page == "🏠 Homepagina":
         # Frame  processing loop
         try:
             while st.session_state.running:
-                # Read frame
+                # Lees frame op de eenvoudige manier
                 ret, frame = cap.read()
                 if not ret:
-                    status_placeholder.error(" ⚠️ Camera error . a.u.b. restarten")
-                    break
+                    # Kleine pauze en opnieuw proberen
+                    time.sleep(0.02)
+                    continue
                 
                 # Process  frame for  gestures
                 processed_frame, data = detector.process_frame(frame, mirror=True)
@@ -320,8 +325,12 @@ if page == "🏠 Homepagina":
                     'THREE_FINGERS': '🤟 3 Vingers',
                     'UNKNOWN': '👋 Aan het wachten voor gebaar...'
                 }
-                gesture_display = gesture_names.get(gesture, '👋 Aan het wachten...')
                 
+                if pinch['active'] and gesture == 'UNKNOWN':
+                    gesture_display = f"🤏 Duim en Wijsvinger aan het knijpen"
+                else:
+                    gesture_display = gesture_names.get(gesture, '👋 Aan het wachten voor gebaar...')
+                    
                 # Update session volume
                 st.session_state.volume = pinch['volume']
                 
@@ -339,7 +348,7 @@ if page == "🏠 Homepagina":
                 # Display gesture
                 gesture_text.markdown(f"""
                 <div style='font-size: {int(36 * ui_scale)}px; font-weight: bold; padding: {int(10 * ui_scale)}px;'>
-                    Gebaar: {gesture_display}
+                    <span style='color: #4CBB17;'>Gebaar:</span> {gesture_display}
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -348,31 +357,25 @@ if page == "🏠 Homepagina":
                     direction = pinch['direction']
                     if direction == 'Higher':
                         volume_text.markdown(f"""
-                        <div style="background-color: #1a1a2e; padding: {int(20 * ui_scale)}px; border-radius: 10px; text-align: center; border: 3px solid #00ff88;">
-                            <p style="margin: 0; font-size: {int(36 * ui_scale)}px; font-weight: bold; color: #00ff88;">
-                                🔊 VOLUME <span style="color: #ff6b6b; font-size: {int(40 * ui_scale)}px;">▲</span>
+                        <div style="background-color: #1a1a2e; padding: {int(10 * ui_scale)}px; border-radius: 6px; text-align: center; border: 2px solid #00ff88;">
+                            <p style="margin: 0; font-size: {int(24 * ui_scale)}px; font-weight: bold; color: #00ff88;">
+                                🔊 VOLUME <span style="color: #ff6b6b; font-size: {int(30 * ui_scale)}px;">▲</span>
                             </p>
-                            <p style="margin: 0; font-size: {int(20 * ui_scale)}px; color: #888;">Volume omhoog</p>
+                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume omhoog</p>
                         </div>
                         """, unsafe_allow_html=True)
                     elif direction == 'Lower':
                         volume_text.markdown(f"""
-                        <div style="background-color: #1a1a2e; padding: {int(20 * ui_scale)}px; border-radius: 10px; text-align: center; border: 3px solid #ff6b6b;">
-                            <p style="margin: 0; font-size: {int(36 * ui_scale)}px; font-weight: bold; color: #ff6b6b;">
-                                🔊 VOLUME <span style="color: #00ff88; font-size: {int(40 * ui_scale)}px;">▼</span>
+                        <div style="background-color: #1a1a2e; padding: {int(10 * ui_scale)}px; border-radius: 6px; text-align: center; border: 2px solid #ff6b6b;">
+                            <p style="margin: 0; font-size: {int(24 * ui_scale)}px; font-weight: bold; color: #ff6b6b;">
+                                🔊 VOLUME <span style="color: #00ff88; font-size: {int(30 * ui_scale)}px;">▼</span>
                             </p>
-                            <p style="margin: 0; font-size: {int(20 * ui_scale)}px; color: #888;">Volume omlaag</p>
+                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume omlaag</p>
                         </div>
                         """, unsafe_allow_html=True)
                 else:
-                    # Show waiting state when not pinching - BIGGER TEXT with UI_SCALE
-                    volume_text.markdown(f"""
-                    <div style="background-color: #1a1a2e; padding: {int(20 * ui_scale)}px; border-radius: 10px; text-align: center; border: 1px solid #555;">
-                        <p style="margin: 0; font-size: {int(24 * ui_scale)}px; color: #888;">
-                            🤏 Knijp je duim en wijsvinger voor volume controle
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Show nothing  when not pinching
+                    volume_text.markdown(f"", unsafe_allow_html=True)
                 
                 # Small delay to prevent CPU overload
                 time.sleep(0.03)
@@ -396,28 +399,29 @@ if page == "🏠 Homepagina":
     **Tips :** 
     - Zorg ervoor dat je hand goed  verlicht is
     - Ga op ongeveer armlengte  afstand van de camera staan
-    - Houd gebaren even vast
+    - Houd gebaren voor 1-2 seconden vast voor de camera
     -  Vergeet niet te blijven  op VLC-mediaspeler venster  tijdens het maken van gebaren
     """)
 
 # Explanation page
 elif page == "📖 Toelichting":
     st.title("📖 Toelichting")
-    st.markdown("Bekijk hieronder  hoe je de gebaren  correct moet maken om MagicHand te gebruiken.")
+    st.markdown("Bekijk instructies hieronder  hoe je MagicHand correct gebruikt .")
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Video
     st.subheader("🎬 Uitlegvideo")
-    st.markdown(" Bekijk de video om te zien  hoe je de gebaren maakt :")
+    st.markdown(" Bekijk deze volledige uitlegvideo van MagicHand :")
     
     #  video link
     video_url = "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
     st.video(video_url)
     
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
     # Example pictures 
-    st.subheader("🖐️ Voorbeeld afbeeldingen van de Gebaren")
+    st.subheader("✋ Voorbeeld afbeeldingen van de Gebaren 👊")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Make 2 rows with  2 photo 's per row
     col1, col2 = st.columns(2)
@@ -427,15 +431,13 @@ elif page == "📖 Toelichting":
         # Photopath
         st.image("high_five.png", use_container_width=True)
     
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    
     with col2:
         st.markdown("**👊 Vuist**")
         st.image("fist.png", use_container_width=True)
+        
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
     col3, col4 = st.columns(2)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
     
     with col3:
         st.markdown("**✌️ 2 Vingers**")
@@ -488,7 +490,7 @@ elif page == "⚙️ Instellingen":
             )
         
         st.divider()
-        st.subheader(" ✌️ Gebaar voor Actie  in VLC-mediaspeler")
+        st.subheader(" ✌️ Gebaar voor Actie  in VLC-mediaspeler 👊")
         
         #Get current gesture mapping
         gestures = current_config.get("gestures", {})
@@ -672,5 +674,5 @@ elif page == "⚙️ Instellingen":
         config = load_config()
         
         st.success("✅ Instellingen zijn  opgeslagen. ")
-        st.info("Herstart de applicatie  om de  nieuwe instellingen te gebruiken . ")
+        st.info("Herstart de web-applicatie  om de  nieuwe instellingen te gebruiken . ")
         st.balloons()

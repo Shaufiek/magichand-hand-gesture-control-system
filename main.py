@@ -219,7 +219,7 @@ class HandDetector:
         ratio = dist / hand_size if hand_size > 0 else 0
         
         # Detect if pinch gesture is made
-        pinching = ratio < 0.8
+        pinching = ratio < 0.8 or dist < 70
         direction = ''
         
         if pinching:
