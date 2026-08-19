@@ -146,7 +146,7 @@ st.markdown(f"""
 #  Sidebar
 with st.sidebar:
     #Logo  at top of sidebar
-    col_logo_center = st.columns([1, 1, 1])
+    col_logo_center = st.columns([1, 3, 1])
     with col_logo_center[1]: 
         display_logo(200)
     st.divider()
@@ -188,7 +188,7 @@ with st.sidebar:
         | 👊 Vuist | Stop |
         | ✌️ 2 Vingers |  Volgende Track |
         | 🤟 3 Vingers | Vorige Track |
-        | 🤏 Duim en Wijsvinger Knijpen | Volume  Controlle |
+        | 🤏 Duim en Wijsvinger Knijpen | Volume Omhoog / Omlaag |
         
         ### Step 4: Stop MagicHand
         -  Click " Stop Camera"
@@ -196,6 +196,8 @@ with st.sidebar:
         
         st.divider()
         st.caption("Gemaakt met ❤️ voor eenvoudige media controlle")
+        st.markdown("Contact: [info@magichand.sr](mailto:info@magichand.sr)")
+        st.caption("**© MAGICHAND 2026**")
 
 #   Homepage
 if page == "🏠 Homepagina":
@@ -269,7 +271,7 @@ if page == "🏠 Homepagina":
         
         st.session_state.cap = cap
         
-        status_placeholder.success("Camera is begonnen. maak gebaren om VLC-mediaspeler te controleren.")
+        status_placeholder.success("Camera is begonnen. maak gebaren om je VLC-mediaspeler te controleren.")
 
     # Stop camera
     if stop_btn:
@@ -348,12 +350,12 @@ if page == "🏠 Homepagina":
                 # Display gesture
                 gesture_text.markdown(f"""
                 <div style='font-size: {int(36 * ui_scale)}px; font-weight: bold; padding: {int(10 * ui_scale)}px;'>
-                    <span style='color: #4CBB17;'>Gebaar:</span> {gesture_display}
+                    <span style='color: #4CBB17;'>Actieve Gebaar:</span> {gesture_display}
                 </div>
                 """, unsafe_allow_html=True)
                 
                 #  Show volume direction only when pinching
-                if pinch['active'] and pinch.get('direction', ''):
+                if pinch['active'] and pinch.get('direction', '') and gesture == 'UNKNOWN':
                     direction = pinch['direction']
                     if direction == 'Higher':
                         volume_text.markdown(f"""
@@ -402,6 +404,10 @@ if page == "🏠 Homepagina":
     - Houd gebaren voor 1-2 seconden vast voor de camera
     -  Vergeet niet te blijven  op VLC-mediaspeler venster  tijdens het maken van gebaren
     """)
+    
+    # Copyright  footer
+    st.divider()
+    st.markdown("<div style='text-align: center;font-weight: bold;'>© MAGICHAND 2026</div>", unsafe_allow_html=True)
 
 # Explanation page
 elif page == "📖 Toelichting":
@@ -453,11 +459,13 @@ elif page == "📖 Toelichting":
     # Make a single centered column for the pinch gesture
     col5, col6, col7 = st.columns([1, 2, 1])
     with col6:
-        st.markdown("**🤏 Duim en Wijsvinger knijpen ( Volume Controlle )**")
+        st.markdown("**🤏 Duim en Wijsvinger knijpen ( Volume Omhoog / Omlaag )**")
         st.image("pinching.png", use_container_width=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     st.info("💡 Tip: Zorg voor  voldoende licht op je  hand en sta op armlengte afstand van de camera ")
+    st.divider()
+    st.markdown("<div style='text-align: center;font-weight: bold;'>© MAGICHAND 2026</div>", unsafe_allow_html=True)
 
 # Settings pagina
 elif page == "⚙️ Instellingen":
@@ -624,7 +632,7 @@ elif page == "⚙️ Instellingen":
         st.subheader("🔍 Weergave Instellingen")
         
         ui_scale_slider = st.slider(
-            "UI Schaalgrootte",
+            "UI - Schaalgrootte",
             min_value=0.8,
             max_value=2.0,
             value=float(current_config.get("ui", {}).get("scale", 1.0)),
@@ -676,3 +684,8 @@ elif page == "⚙️ Instellingen":
         st.success("✅ Instellingen zijn  opgeslagen. ")
         st.info("Herstart de web-applicatie  om de  nieuwe instellingen te gebruiken . ")
         st.balloons()
+
+    st.divider()
+    st.markdown("<div style='text-align: center;font-weight: bold;'>© MAGICHAND 2026</div>", unsafe_allow_html=True)   
+    
+    
