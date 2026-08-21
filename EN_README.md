@@ -7,7 +7,7 @@
 ## What  You Need
 
 - Python  3.8 or higher
-- A working webcam
+- A pc/laptop with a working webcam
 -  VLC  media player
 - Music or video files  to play
 
