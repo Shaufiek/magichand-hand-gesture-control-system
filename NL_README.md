@@ -66,9 +66,9 @@ Maak een  map music in  je projectmap  en zet  daar je bestanden in :
 
 1. Dubbelklik op run.bat
 2.  Je browser opent automatisch
-3. Open VLC  handmatig en laad je muziek/video 's
+3. Open VLC - mediaspeler  handmatig en laad je muziek/video 's
 4. Klik op  " Start Camera "  in de web app
-5. Maak gebaren  om VLC te bedienen 
+5. Maak gebaren  om VLC - mediaspeler te bedienen 
 6. Klik op " Stop Camera " of sluit  je browser  om te stoppen
 
 ## Gebaren Overzicht
