@@ -1,6 +1,6 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC - mediqspeler kunt bedienen met alleen je handgebaren en  via je webcam. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
+**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC - mediaspeler kunt bedienen met alleen je handgebaren en  via je webcam. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
 
 ---
 
