@@ -7,7 +7,7 @@
 ## Wat Heb Je Nodig
 
 - Python 3.8  of hoger
-- Een werkende webcam
+- Een laptop/pc met een werkende webcam
 - VLC - mediaspeler
 -  Muziek - of videobestanden om af te spelen
 
