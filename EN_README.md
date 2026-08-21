@@ -25,7 +25,7 @@ Make sure these files are in one folder :
 - `config.json` - Settings
 - `requirements.txt` - Required packages
 - `run.bat` - Starts the app  with one click ( Windows )
-- `magichand_logo.png` #  Your own logo
+- `magichand_logo.png` #  MagicHand logo
 
 ### 2. Setting Up  the Python Environment
 
