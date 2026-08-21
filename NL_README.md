@@ -25,7 +25,7 @@
 - `config.json` -  Instelingen
 - `requirements.txt` -  Benodigde pakketten
 - `run.bat` - Start de app met 1  klik ( Windows)
-- `magichand_logo.png` # Je eigen logo
+- `magichand_logo.png` # MagicHand logo
 
 ### 2. Python Omgeving instellen
 
