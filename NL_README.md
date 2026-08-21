@@ -8,7 +8,7 @@
 
 - Python 3.8  of hoger
 - Een werkende webcam
-- VLC media player 
+- VLC - mediaspeler
 -  Muziek - of videobestanden om af te spelen
 
 ---
