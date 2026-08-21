@@ -1,13 +1,13 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
+**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam from your laptop/pc. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
 
 ---
 
 ## What  You Need
 
 - Python  3.8 or higher
-- A pc/laptop with a working webcam
+- A laptop/pc with a working webcam
 -  VLC  media player
 - Music or video files  to play
 
