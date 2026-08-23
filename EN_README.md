@@ -1,13 +1,13 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam from your laptop/pc. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
+**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam from your laptop / pc. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
 
 ---
 
 ## What  You Need
 
 - Python  3.8 or higher
-- A laptop/pc with a working webcam
+- A laptop / pc with a working webcam
 -  VLC  media player
 - Music or video files  to play
 
@@ -15,7 +15,7 @@
 
 ##  Setup
 
-### 1. Download the files
+### 1.  Download the files
 Make sure these files are in one folder :
 
 📁 MagicHand/
@@ -39,7 +39,7 @@ cd C:\your-folder
 #### b. Create a virtual environment
 python -m venv venv
 
-### c. Activate  the environment
+###  c. Activate  the environment
 **Windows:** `venv\Scripts\activate` or `venv\Scripts\Activate.ps1`
 **Mac/Linux:**  `source venv/bin/activate`
 
@@ -66,7 +66,7 @@ Create a  “ music ” folder in  your project folder  and place  your files th
 
 1. Double-click run.bat
 2.  Your browser will open automatically
-3. Manually open VLC media player and load your music/videos
+3. Manually open VLC media player and load your music / videos
 4. Click  “ Start Camera”  in the web app
 5. Make  gestures  to control VLC media player
 6. Click “ Stop Camera ” or close  your browser  to stop

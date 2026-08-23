@@ -1,13 +1,13 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC - mediaspeler kunt bedienen met alleen je handgebaren en  via je webcam van je laptop/pc. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
+**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC - mediaspeler kunt bedienen met alleen je handgebaren en  via je webcam van je laptop / pc. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
 
 ---
 
 ## Wat Heb Je Nodig
 
 - Python 3.8  of hoger
-- Een laptop/pc met een werkende webcam
+- Een laptop / pc met een werkende webcam
 - VLC - mediaspeler
 -  Muziek - of videobestanden om af te spelen
 
@@ -32,7 +32,7 @@
 #### Wat is  een virtuele omgeving ?
 Een virtuele omgeving  zorgt ervoor dat de  pakketten voor dit project  niet door elkaar lopen met andere projecten op je computer .
 
-#### a. Open Terminal
+####  a. Open Terminal
 Open PowerShell ( Windows ) of Terminal ( Mac/Linux) in je projectmap :
 cd C:\jouw-map
 
@@ -83,7 +83,7 @@ Maak een  map music in  je projectmap  en zet  daar je bestanden in :
 
 **Tip:**  Hoe verder je duim en  wijsvinger uit elkaar staan , hoe harder het volume
 
-## Instellingen Aanpassen
+## Instellingen  Aanpassen
 
 **Je kunt MagicHand eenvoudig aanpassen via de web app zelf:**
 
@@ -97,7 +97,7 @@ Maak een  map music in  je projectmap  en zet  daar je bestanden in :
 
 **Tip:**  Alle  instellingen  worden automatisch opgeslagen in config.json .
 
-## Problemen Oplossen
+##  Problemen Oplossen
 
 | Probleem | Oplossing |
 |---------|---------|

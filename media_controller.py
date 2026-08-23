@@ -4,7 +4,7 @@ import os
 import json
 
 class MediaController:
-    """Sends keyboard commands to  VLC based on detected gestures"""
+    """Sends keyboard commands to  VLC media player based on detected gestures"""
     
     def __init__(self):
         # Load setings
@@ -104,7 +104,7 @@ class MediaController:
         return True
 
     def handle_gesture(self, data):
-        """ Take a gesture  and turn it into  a VLC command """
+        """ Take a gesture  and turn it into  a VLC - command """
         now = time.time()
         
         #  Handle spam commands

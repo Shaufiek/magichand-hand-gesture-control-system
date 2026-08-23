@@ -185,7 +185,7 @@ class HandDetector:
         if extended_count >= 3 and index_up and middle_up and thumb_extended:
             return "OPEN_PALM"
         
-        # Fist : most fingers  down and thumb in
+        # Fist: most fingers  down and thumb in
         elif extended_count <= 1 and not thumb_extended:
             return "FIST"
         

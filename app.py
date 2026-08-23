@@ -1,4 +1,4 @@
-# Web  interface for the  system using streamlit
+# Web  interface for the  system using Streamlit
 
 # Import esential libraries
 import streamlit as st
@@ -167,17 +167,17 @@ with st.sidebar:
         st.header("📋 Instructies")
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("""
-        ### Stap 1: Open VLC-mediaspeler
-        - Open VLC-mediaspeler  op je desktop
-        - Laad  jouw muziek/video's
+        ### Stap 1: Open VLC - mediaspeler
+        - Open VLC - mediaspeler  op je desktop
+        - Laad  jouw muziek / video's
         
         ### Stap 2 : Start Camera
-        - Click de " Start Camera" knop op de web-app
+        - Click de " Start Camera" knop op de webapplicatie
         - Sta  voor jouw camera
         
         ### Stap 3: Maak Gebaren
         
-        - **Click op  de VLC-mediaspeler venster** om hem als actief te  houden
+        - **Click op  de VLC - mediaspeler venster** om hem als actief te  houden
         
         
         **Standaard Gebaar Handleiding**:
@@ -213,7 +213,7 @@ if page == "🏠 Homepagina":
     st.markdown(f"""
     <div style='text-align: center;'>
         <p style='font-size: {int(28 * ui_scale)}px; font-weight: 300; color: #aaa; margin-top: -5px;'>
-             controleer jouw muziek/video's met simpele hand gebaren
+             controleer jouw muziek / video's met simpele hand gebaren
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -271,7 +271,7 @@ if page == "🏠 Homepagina":
         
         st.session_state.cap = cap
         
-        status_placeholder.success("Camera is begonnen. maak gebaren om je VLC-mediaspeler te controleren.")
+        status_placeholder.success("Camera is begonnen. maak gebaren om je VLC - mediaspeler te controleren.")
 
     # Stop camera
     if stop_btn:
@@ -292,7 +292,7 @@ if page == "🏠 Homepagina":
         controller = st.session_state.controller
         
         # Show reminder
-        st.warning("⚠️ Zorg ervoor dat VLC-mediaspeler geopend is en als actieve venster is !")
+        st.warning("⚠️ Zorg ervoor dat VLC - mediaspeler geopend is en als actieve venster is .")
         
         #Create a container for the video
         video_container = st.empty()
@@ -363,7 +363,7 @@ if page == "🏠 Homepagina":
                             <p style="margin: 0; font-size: {int(24 * ui_scale)}px; font-weight: bold; color: #00ff88;">
                                 🔊 VOLUME <span style="color: #ff6b6b; font-size: {int(30 * ui_scale)}px;">▲</span>
                             </p>
-                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume omhoog</p>
+                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume Omhoog</p>
                         </div>
                         """, unsafe_allow_html=True)
                     elif direction == 'Lower':
@@ -372,7 +372,7 @@ if page == "🏠 Homepagina":
                             <p style="margin: 0; font-size: {int(24 * ui_scale)}px; font-weight: bold; color: #ff6b6b;">
                                 🔊 VOLUME <span style="color: #00ff88; font-size: {int(30 * ui_scale)}px;">▼</span>
                             </p>
-                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume omlaag</p>
+                            <p style="margin: 0; font-size: {int(10 * ui_scale)}px; color: #888;">Volume Omlaag</p>
                         </div>
                         """, unsafe_allow_html=True)
                 else:
@@ -402,7 +402,7 @@ if page == "🏠 Homepagina":
     - Zorg ervoor dat je hand goed  verlicht is
     - Ga op ongeveer armlengte  afstand van de camera staan
     - Houd gebaren voor 1-2 seconden vast voor de camera
-    -  Vergeet niet te blijven  op VLC-mediaspeler venster  tijdens het maken van gebaren
+    -  Vergeet niet te blijven  op VLC - mediaspeler venster  tijdens het maken van gebaren
     """)
     
     # Copyright  footer
@@ -498,7 +498,7 @@ elif page == "⚙️ Instellingen":
             )
         
         st.divider()
-        st.subheader(" ✌️ Gebaar voor Actie  in VLC-mediaspeler 👊")
+        st.subheader(" ✌️ Gebaar voor Actie  in VLC - mediaspeler 👊")
         
         #Get current gesture mapping
         gestures = current_config.get("gestures", {})
@@ -682,7 +682,7 @@ elif page == "⚙️ Instellingen":
         config = load_config()
         
         st.success("✅ Instellingen zijn  opgeslagen. ")
-        st.info("Herstart de web-applicatie  om de  nieuwe instellingen te gebruiken . ")
+        st.info("Herstart de webapplicatie  om de  nieuwe instellingen te gebruiken . ")
         st.balloons()
 
     st.divider()
