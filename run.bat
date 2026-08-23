@@ -3,7 +3,7 @@ echo =========================================
 echo  MagicHand
 echo =========================================
 echo.
-echo Zorg ervoor dat VLC-mediaspeler geopend en klaar voor gebruik is!
+echo Zorg ervoor dat VLC-mediaspeler geopend en klaar voor gebruik staat
 echo.
 echo Virtuele omgeving aan het activeren...
 echo.
@@ -11,7 +11,7 @@ echo.
 REM Activate the virtual environment
 call venv\Scripts\activate.bat
 
-echo Web-applicatie aan het openen...
+echo MagicHand aan het openen...
 echo.
 streamlit run app.py
 
