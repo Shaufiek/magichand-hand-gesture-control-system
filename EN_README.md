@@ -1,13 +1,13 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
+**MagicHand** is a user - friendly system  that lets you control  VLC media player using only your  hand gestures and your webcam from your laptop/pc. This allows you to simply raise your hand and control the player , without complicated remote controls or keyboards
 
 ---
 
 ## What  You Need
 
 - Python  3.8 or higher
-- A working webcam
+- A laptop/pc with a working webcam
 -  VLC  media player
 - Music or video files  to play
 
@@ -21,11 +21,11 @@ Make sure these files are in one folder :
 📁 MagicHand/
 - `app.py` - Web app interface
 - `main.py` -  Hand detection
-- `media_controller.py` - Sends  commands to VLC
+- `media_controller.py` - Sends  commands to VLC media player
 - `config.json` - Settings
 - `requirements.txt` - Required packages
 - `run.bat` - Starts the app  with one click ( Windows )
-- `magichand_logo.png` #  Your own logo
+- `magichand_logo.png` #  MagicHand logo
 
 ### 2. Setting Up  the Python Environment
 
@@ -66,9 +66,9 @@ Create a  “ music ” folder in  your project folder  and place  your files th
 
 1. Double-click run.bat
 2.  Your browser will open automatically
-3. Manually open VLC and load your music/videos
+3. Manually open VLC media player and load your music/videos
 4. Click  “ Start Camera”  in the web app
-5. Make  gestures  to control VLC
+5. Make  gestures  to control VLC media player
 6. Click “ Stop Camera ” or close  your browser  to stop
 
 ## Gesture Overview
@@ -102,7 +102,7 @@ Create a  “ music ” folder in  your project folder  and place  your files th
 | Problem | Solution |
 |---------|---------|
 | No  camera feed | Check that your webcam is connected . Change the `device_id` in `config.json` from 0 to 1 |
-| VLC is not  responding  | Click on the VLC window to make it active |
+| VLC media player is not  responding  | Click on the VLC window to make it active |
 |  Gestures are not recognized | Make sure your hand is n good lightning . Stand at arm ’s length. Hold each gesture for a moment |
 | App does not start | Settings ==>  Check that you have  activated your venv and run `pip install -r requirements.txt` |
 

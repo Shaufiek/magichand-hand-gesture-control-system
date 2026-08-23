@@ -1,14 +1,14 @@
 # 🖐️ MagicHand 👊
 
-**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC media player kunt bedienen met alleen je handgebaren en  via je webcam. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
+**MagicHand** is een  gebruiksvriendelijk systeem waarmee je  VLC - mediaspeler kunt bedienen met alleen je handgebaren en  via je webcam van je laptop/pc. Hiermee kan je dan gewoon  je hand opsteken en bedienen , zonder ingewikkelde afstandsbedieningen of toetsenborden 
 
 ---
 
 ## Wat Heb Je Nodig
 
 - Python 3.8  of hoger
-- Een werkende webcam
-- VLC media player 
+- Een laptop/pc met een werkende webcam
+- VLC - mediaspeler
 -  Muziek - of videobestanden om af te spelen
 
 ---
@@ -25,7 +25,7 @@
 - `config.json` -  Instelingen
 - `requirements.txt` -  Benodigde pakketten
 - `run.bat` - Start de app met 1  klik ( Windows)
-- `magichand_logo.png` # Je eigen logo
+- `magichand_logo.png` # MagicHand logo
 
 ### 2. Python Omgeving instellen
 
@@ -66,9 +66,9 @@ Maak een  map music in  je projectmap  en zet  daar je bestanden in :
 
 1. Dubbelklik op run.bat
 2.  Je browser opent automatisch
-3. Open VLC  handmatig en laad je muziek/video 's
+3. Open VLC - mediaspeler  handmatig en laad je muziek/video 's
 4. Klik op  " Start Camera "  in de web app
-5. Maak gebaren  om VLC te bedienen 
+5. Maak gebaren  om VLC - mediaspeler te bedienen 
 6. Klik op " Stop Camera " of sluit  je browser  om te stoppen
 
 ## Gebaren Overzicht

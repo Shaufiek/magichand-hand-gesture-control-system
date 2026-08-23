@@ -196,7 +196,7 @@ with st.sidebar:
         
         st.divider()
         st.caption("Gemaakt met ❤️ voor eenvoudige media controlle")
-        st.markdown("Contact: [info@magichand.sr](mailto:info@magichand.sr)")
+        st.markdown("Contact: [visionx@gmail.com](mailto:visionx@gmail.com)")
         st.caption("**© MAGICHAND 2026**")
 
 #   Homepage
@@ -325,13 +325,13 @@ if page == "🏠 Homepagina":
                     'FIST': '👊 Vuist',
                     'TWO_FINGERS': '✌️2 Vingers',
                     'THREE_FINGERS': '🤟 3 Vingers',
-                    'UNKNOWN': '👋 Aan het wachten voor gebaar...'
+                    'UNKNOWN': '👋 Aan het wachten voor een gebaar...'
                 }
                 
                 if pinch['active'] and gesture == 'UNKNOWN':
                     gesture_display = f"🤏 Duim en Wijsvinger aan het knijpen"
                 else:
-                    gesture_display = gesture_names.get(gesture, '👋 Aan het wachten voor gebaar...')
+                    gesture_display = gesture_names.get(gesture, '👋 Aan het wachten voor een gebaar...')
                     
                 # Update session volume
                 st.session_state.volume = pinch['volume']
@@ -420,7 +420,7 @@ elif page == "📖 Toelichting":
     st.markdown(" Bekijk deze volledige uitlegvideo van MagicHand :")
     
     #  video link
-    video_url = "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+    video_url = "https://www.youtube.com/watch?v=GeHHho6uqrI"
     st.video(video_url)
     
     st.markdown("<br><br>", unsafe_allow_html=True)
