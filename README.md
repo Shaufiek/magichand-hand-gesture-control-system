@@ -62,7 +62,7 @@ Create a  “ music ” folder in  your project folder  and place  your files th
 
 ##  How to Use MagicHand ?
 
-###   Web App
+###  Web App
 
 1. Double-click run.bat
 2.  Your browser will open automatically
@@ -70,6 +70,9 @@ Create a  “ music ” folder in  your project folder  and place  your files th
 4. Click  “ Start Camera”  in the web app
 5. Make  gestures  to control VLC media player
 6. Click “ Stop Camera ” or close  your browser  to stop
+
+### Use manually
+run the following command in  terminal: streamlit run app.py
 
 ## Gesture Overview
 
