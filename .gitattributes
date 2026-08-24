@@ -1,2 +1,13 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Specific file types
+*.py text
+*.json text
+*.txt text
+*.md text
+*.bat text eol=crlf 
+*.sh text eol=lf    
+*.png binary
+*.jpg binary
+*.ico binary
