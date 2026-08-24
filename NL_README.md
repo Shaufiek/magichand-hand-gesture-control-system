@@ -71,6 +71,9 @@ Maak een  map music in  je projectmap  en zet  daar je bestanden in :
 5. Maak gebaren  om VLC - mediaspeler te bedienen 
 6. Klik op " Stop Camera " of sluit  je browser  om te stoppen
 
+### Gebruik handmatig
+voer het volgende command uit in terminal: streamlit run app.py
+
 ## Gebaren Overzicht
 
 | Gebaar | Wat het doet |
