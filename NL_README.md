@@ -107,13 +107,13 @@ voer het volgende command uit in terminal: streamlit run app.py
 | Geen  camera beeld | Controleer of je webcam is aangesloten . Wijzig device_id in config.json van 0 naar 1 |
 | VLC reageert niet  | Klik eerst op het VLC - venster zodat het actief is |
 |  Gebaren worden niet herkend | Zorg voor goed licht  op je hand. Sta op armlengte afstand . Houd  gebaren even vast |
-| App start niet | Instellingen ==>  Controleer of je venv hebt geactiveerd en pip install -r requirements.txt hebt gedaan  |
+| App start niet | Controleer of je venv hebt geactiveerd en pip install -r requirements.txt hebt gedaan  |
 
 ## Extra Tips voor Gebruikers
 - **Licht:**  Zorg voor goed licht op je hand , anders ziet de camera je gebaren niet goed
 - **Afstand:** Ga op  ongeveer armlengte afstand  van de camera staan
 -  **Geduld:** Houd een gebaar even vast voor 1-2 seconden  voordat het systeem  reageert
-- **VLC:** Vergeet  niet om op het VLC - venster te klikken  voordat je gebaren maakt
+- **VLC - mediaspeler:** Vergeet  niet om op het VLC - venster te klikken  voordat je gebaren maakt
 
 ---
 
