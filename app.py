@@ -265,7 +265,7 @@ if page == "🏠 Homepagina":
         if not cap.isOpened():
             cap = cv2.VideoCapture(1)
         
-        #  basis instellingen
+        # Camera resolution
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, cam["frame_width"])
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam["frame_height"])
         
