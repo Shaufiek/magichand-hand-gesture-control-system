@@ -107,13 +107,13 @@ run the following command in  terminal: streamlit run app.py
 | No  camera feed | Check that your webcam is connected . Change the `device_id` in `config.json` from 0 to 1 |
 | VLC media player is not  responding  | Click on the VLC window to make it active |
 |  Gestures are not recognized | Make sure your hand is n good lightning . Stand at arm ’s length. Hold each gesture for a moment |
-| App does not start | Settings ==>  Check that you have  activated your venv and run `pip install -r requirements.txt` |
+| App does not start | Check that you have  activated your venv and run `pip install -r requirements.txt` |
 
 ## Additional Tips for Users
 - **Lighting:**  Make sure your hand is well - lit. If nopt then the camera won ’t see your gestures clearly
 - **Distance:** Stand  about an arm ’s length  away from the  camera
 -  **Patience:** Hold a gesture for 1 – 2 seconds  before the system  responds
-- **VLC:** Don’t forget to click on the VLC window before making gestures
+- **VLC media player:** Don’t forget to click on the VLC window before making gestures
 
 ---
 
